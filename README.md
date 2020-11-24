@@ -16,7 +16,7 @@ scramv1 b clean; scramv1 b # always make a clean build
 
 **step3>>**
 
-git clone git@github.com:hardikroutray/displacedscouting_fitscountlimits.git\
+git clone git@github.com:hardikroutray/displacedscouting_fitscountlimits.git
 
 **step4>>**
 
@@ -26,7 +26,7 @@ python make_datacard_v0.py $1 will create a mass folder with all datacards along
 **step5>>**
 
 Create multibin datacards for the same mass and store Nevt UL or xsec UL or br UL as csv file\
-python cal_limit_v0.py $1 will create multibin datacards for given lifetime(lifetimes array inside cal_limit_v0 script) inside the created mass folders and store limits for each mass and various lifetimes as a csv file
+python cal_limit_v0.py $1 will create multibin datacards for given lifetimes(lifetimes array inside cal_limit_v0 script) inside the previously created mass folders and store limits for each mass and various lifetimes as a csv file
 
 **step5>>**
 
