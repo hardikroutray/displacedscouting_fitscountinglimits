@@ -430,7 +430,9 @@ def get_chisq(poly="cheb",order=4,mask=True,saveplot=False,sigshape="bwg"):
                         os.makedirs("bias_signalinjection_pvalue")  
                 C_KS.Print("bias_signalinjection_pvalue/goodnessoffit_mass{}_lxy{}_{}_{}_order{}.png".format(mass, lxybins[j,0], lxybins[j,1],poly,order))
 
-                INJ = [0.,2.,5.]
+                ################################BiasTest using toys from same polynomial#################################
+
+                INJ = [2.]
                 ntoys = 500
                 cardname = "simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt".format(mass, lxybins[j,0],lxybins[j,1],poly,order)
                 name = "analysis"
@@ -488,7 +490,7 @@ def get_chisq(poly="cheb",order=4,mask=True,saveplot=False,sigshape="bwg"):
                         H.Draw("e0")                
 
                         C_B.SaveAs("bias_signalinjection_pvalue/biastest{}_mass{}_lxy{}_{}_{}_order{}.png".format(i, mass, lxybins[j,0], lxybins[j,1],poly,order))
-                
+                ################################################################################
 
         if saveplot:
                 ggphipoly = open("mass{}.csv".format(mass), "a")
