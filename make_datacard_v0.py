@@ -85,7 +85,7 @@ bins = int(round((xfitup-xfitdown)/binwidth))
 print xsigup, xsigdown, xfitup, xfitdown, bins
 print float(xsigup), float(xsigdown), float(xfitup), float(xfitdown), int(bins) 
 
-def get_chisq(poly="cheb",order=4,mask=True,saveplot=False,sigshape="bwg"):
+def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"):
 	
 	x = ROOT.RooRealVar("x","x",float(xfitdown),float(xfitup))
 
@@ -127,8 +127,13 @@ def get_chisq(poly="cheb",order=4,mask=True,saveplot=False,sigshape="bwg"):
             # signal = ROOT.RooAddPdf("signal", "signal", ROOT.RooArgList(cbs_1,cbs_2), ROOT.RooArgList(mc_frac))
 
             # mean1 = ROOT.RooRealVar("mean1","Mean of Gaussian",float(mass- (25*binwidth)),float(mass + (25*binwidth)))
-            mean1 = ROOT.RooRealVar("mean1","Mean of Gaussian", mu)                                                                         
-            sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.35)                                                                     
+            mean1 = ROOT.RooRealVar("mean1","Mean of Gaussian", mu)                                                           
+
+            if mass > 2:  
+                sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.35)                                                  
+            else:
+                sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.05)    
+
             gaus = ROOT.RooGaussian("gaus","gaus",x,mean1,sigma1)
             mc_frac1 = ROOT.RooRealVar("mc_frac1", "mc_frac1", 0.5)
 
@@ -166,7 +171,11 @@ def get_chisq(poly="cheb",order=4,mask=True,saveplot=False,sigshape="bwg"):
         print p
 
 	nB = data.Integral()
-        background_norm = ROOT.RooRealVar("background_norm","background_norm",nB,0.9*nB,1.1*nB)
+        if nB != 0:
+            background_norm = ROOT.RooRealVar("background_norm","background_norm",nB,0.9*nB,1.1*nB)
+        else:
+            background_norm = ROOT.RooRealVar("background_norm","background_norm",nB,0.0,0.000001)
+
         # background_norm = ROOT.RooRealVar("background_norm","background_norm",nB,0.5*nB,1.5*nB) 
 	
 	model = ROOT.RooAddPdf("model","model",ROOT.RooArgList(background),ROOT.RooArgList(background_norm))
