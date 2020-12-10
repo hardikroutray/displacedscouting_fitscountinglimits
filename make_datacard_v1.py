@@ -898,9 +898,9 @@ def crossbias(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,sigshape="dc
             os.system('rm higgsCombineanalysis0.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
             os.system('rm higgsCombineanalysis0.000000.GenerateOnly.mH{}.123456.root'.format(mass))
             os.system('rm fitDiagnosticsanalysis0.000000.root')
-            os.system('rm higgsCombineanalysis1.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
-            os.system('rm higgsCombineanalysis1.000000.GenerateOnly.mH{}.123456.root'.format(mass))
-            os.system('rm fitDiagnosticsanalysis1.000000.root')
+            os.system('rm higgsCombineanalysis2.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
+            os.system('rm higgsCombineanalysis2.000000.GenerateOnly.mH{}.123456.root'.format(mass))
+            os.system('rm fitDiagnosticsanalysis2.000000.root')
 
 
 def counting():
