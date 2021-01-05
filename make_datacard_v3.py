@@ -202,7 +202,7 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 par.add(p[i])
             bern = ROOT.RooBernstein("bern","bern", x, par)
             
-            expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-1.,1.)
+            expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
             expo = ROOT.RooExponential("expo","expo",x,expo_1)
 
             background = ROOT.RooProdPdf("background","background",RooArgList(expo,bern))
