@@ -244,15 +244,15 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
 
             elif order == 3:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**2)",RooArgList(x,expo_1,a,b,c,d))
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**3)",RooArgList(x,expo_1,a,b,c,d))
             
             elif order == 4:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**2 + e*x**2)",RooArgList(x,expo_1,a,b,c,d,e))
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**3 + e*x**4)",RooArgList(x,expo_1,a,b,c,d,e))
 
             elif order == 5:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**2 + e*x**2 + f*x**2)",RooArgList(x,expo_1,a,b,c,d,e,f))
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,expo_1,a,b,c,d,e,f))
 
 
         print p
