@@ -45,7 +45,7 @@ masseslist = [0.2, 0.202, 0.204, 0.206, 0.208, 0.21, 0.212, 0.214, 0.216, 0.218,
 
 masseslist = [0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 
-masseslist = [4.5]
+masseslist = [25]
 
 print len(masseslist)
 
@@ -71,11 +71,11 @@ os.chdir("./mass_{}".format(mass))
 # tree_muMC = ROOT.TChain('t')
 # tree_muMC.Add("/cms/routray/hzd_mass_ctau_scan.root")
 tree_mudata = ROOT.TChain('t')
-tree_mudata.Add("/uscms/home/hroutray/nobackup/CMSSW_10_2_13/src/HiggsAnalysis/CombinedLimit/GOHERE/data_subset_pass_all.root")
+tree_mudata.Add("/cms/routray/data_subset_pass_all.root")
 # tree_mudata.Print()
 
 # lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
-lxybins = np.array([[0.2,1.0]])
+lxybins = np.array([[1.0,2.4]])
 #print lxybins[0,0], lxybins[0,1]
 
 mu = mass
@@ -203,7 +203,7 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 par.add(p[i])
             background = ROOT.RooExponentialSum("background","background", x, par)
 
-        if poly == "polyexpo":
+        if poly == "expo*poly":
 
             # for i in range(order+1):
             #     p[i] = ROOT.RooRealVar("p{}".format(i),"p{}".format(i),0,1000000000.)
@@ -253,6 +253,45 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
             elif order == 5:
 
                 background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,expo_1,a,b,c,d,e,f))
+
+
+        if poly == "expo^poly":    
+
+            # expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
+
+            a = ROOT.RooRealVar("a","a",0.1,-100000000000,10000000000)
+            b = ROOT.RooRealVar("b","b",0.1,-10000000000,10000000000)
+            c = ROOT.RooRealVar("c","c",0.1,-10000000000,10000000000)
+            d = ROOT.RooRealVar("d","d",0.1,-10000000000,1000000000)
+            e = ROOT.RooRealVar("e","e",0.1,-10000000000,1000000000)
+            f = ROOT.RooRealVar("f","f",0.1,-10000000000,1000000000)
+            g = ROOT.RooRealVar("g","g",0.1,-10000000000,1000000000)
+
+
+            if order == 0:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(a)",RooArgList(x,a))
+
+            elif order == 1:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x)",RooArgList(x,a,b))
+
+            elif order == 2:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2)",RooArgList(x,a,b,c))
+
+            elif order == 3:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2 + d*x**3)",RooArgList(x,a,b,c,d))
+            
+            elif order == 4:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2 + d*x**3 + e*x**4)",RooArgList(x,a,b,c,d,e))
+
+            elif order == 5:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,a,b,c,d,e,f))
+
 
 
         print p
@@ -377,7 +416,6 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                                                                            
         datacard.close()                                                                                             
 
-
 	os.system('combine -M  AsymptoticLimits -m {} --rAbsAcc=0.0001 --rRelAcc=0.001 simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt > com.out'.format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order)) 
 	os.system('cat com.out')                                                                                                                                                                           
         com_out = open('com.out','r')                                                                                                                                                                       
@@ -393,9 +431,10 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                         coml_exp = float(line[19:])                                                                                                                                                        
 			
                 elif line[:15] == 'Expected 84.0%:':                                                                                                                                                       
-                        coml_1su = float(line[19:])                                                                                                                                                                                                                                                                                                                                                                   
+                        coml_1su = float(line[19:])                                                                                                                                                                                                                                                                                                                                                                
                 elif line[:15] == 'Expected 97.5%:':                                                                                                                                                       
                         coml_2su = float(line[19:])     
+
 
 	os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt".format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order))
 	KS_Fs = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".root")
@@ -551,7 +590,7 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 ################################BiasTest using toys from same polynomial#################################
 
                 INJ = [0.]
-                ntoys = 500
+                ntoys = 100
                 cardname = "simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt".format(mass, lxybins[j,0],lxybins[j,1],poly,order)
                 name = "analysis"
 
@@ -941,7 +980,39 @@ for j in range(len(lxybins)):
 
         # '''
 
-        polytype = "polyexpo"
+        polytype = "expo*poly"
+
+        if numsideband < 0:
+
+                counting()
+
+
+        else:
+            
+            
+                import scipy.stats                                                                                                                                                          
+                from array import array     
+                
+                numbins = len(x_unmasked) 
+
+                rss = 0
+                for o in range(10):
+                        rss0 = rss
+                        # residuals = get_chisq(poly=polytype,order=o+1,mask=False,saveplot=False,sigshape="dcbg")
+                        residuals = get_chisq(poly=polytype,order=o,mask=False,saveplot=False,sigshape="dcbg")
+                        rss = residuals[5] 
+                        ndf = numbins - (o)
+                        fvalue = (rss0 - rss)/(rss/ndf)                                                                                                                                     
+                        fcrit = scipy.stats.f.ppf(q=1-0.05, dfn=1, dfd=ndf) 
+                
+                        if o > 0 and fvalue < fcrit:                                                                                                                                      
+                                break                                                                                                                                                      
+                bestorder = o - 1                                                                                                                                                       
+                print bestorder
+
+                get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
+
+        polytype = "expo^poly"
 
         if numsideband < 0:
 
@@ -973,11 +1044,12 @@ for j in range(len(lxybins)):
 
                 # get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
                 # get_chisq(poly="expo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
-                get_chisq(poly="polyexpo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
+                get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
+
 
         # '''
 
-        # get_chisq(poly="polyexpo",order=0,mask=False,saveplot=True,sigshape="dcbg")
+        # get_chisq(poly="expo^poly",order=1,mask=False,saveplot=True,sigshape="dcbg")
 
 
 os.chdir("./..")
