@@ -45,6 +45,7 @@ masseslist = [0.2, 0.202, 0.204, 0.206, 0.208, 0.21, 0.212, 0.214, 0.216, 0.218,
 
 masseslist = [0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 
+masseslist = [4.5]
 
 print len(masseslist)
 
@@ -70,11 +71,11 @@ os.chdir("./mass_{}".format(mass))
 # tree_muMC = ROOT.TChain('t')
 # tree_muMC.Add("/cms/routray/hzd_mass_ctau_scan.root")
 tree_mudata = ROOT.TChain('t')
-tree_mudata.Add("/cms/routray/data_subset_pass_all.root")
+tree_mudata.Add("/uscms/home/hroutray/nobackup/CMSSW_10_2_13/src/HiggsAnalysis/CombinedLimit/GOHERE/data_subset_pass_all.root")
 # tree_mudata.Print()
 
 # lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
-lxybins = np.array([[0.0,0.2]])
+lxybins = np.array([[0.2,1.0]])
 #print lxybins[0,0], lxybins[0,1]
 
 mu = mass
@@ -195,22 +196,66 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
             background = ROOT.RooGenericPdf("background","TMath::Power(@0,@1)",RooArgList(x,pow_1))
 
 
-        if poly == "bernexpo":
+        if poly == "exposum":
 
             for i in range(order+1):
                 p[i] = ROOT.RooRealVar("p{}".format(i),"p{}".format(i),-1,1000000000)
                 par.add(p[i])
-            bern = ROOT.RooBernstein("bern","bern", x, par)
+            background = ROOT.RooExponentialSum("background","background", x, par)
+
+        if poly == "polyexpo":
+
+            # for i in range(order+1):
+            #     p[i] = ROOT.RooRealVar("p{}".format(i),"p{}".format(i),0,1000000000.)
+            #     par.add(p[i])
+            # bern = ROOT.RooBernstein("bern","bern", x, par)
+
+            for i in range(order+1):
+                p[i] = ROOT.RooRealVar("p{}".format(i),"p{}".format(i),-100000,100000)
+                par.add(p[i])
+            simplepoly = ROOT.RooPolynomial("simplepoly","simplepoly", x, par)
             
             expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
             expo = ROOT.RooExponential("expo","expo",x,expo_1)
 
-            background = ROOT.RooProdPdf("background","background",RooArgList(expo,bern))
+            a = ROOT.RooRealVar("a","a",1,-1000000000,100000000)
+            b = ROOT.RooRealVar("b","b",1,-100000000,100000000)
+            c = ROOT.RooRealVar("c","c",1,-100000000,100000000)
+            d = ROOT.RooRealVar("d","d",1,-100000000,10000000)
+            e = ROOT.RooRealVar("e","e",1,-100000000,10000000)
+            f = ROOT.RooRealVar("f","f",1,-100000000,10000000)
+            g = ROOT.RooRealVar("g","g",1,-100000000,10000000)
+
+            # background = ROOT.RooProdPdf("background","background",RooArgList(simplepoly,expo))
             # background = ROOT.RooFFTConvPdf("background","background",x,bern,expo)
-            # background = ROOT.RooGenericPdf("background","TMath::Power(@0,@1)",RooArgList(expo,bern))
+            # background = ROOT.RooGenericPdf("background","TMath::Power(@0,@1)",RooArgList(expo,simplepoly))
+            # background = ROOT.RooGenericPdf("background","TMath::Exp(@0)",RooArgList(simplepoly))
+
+            if order == 0:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * a",RooArgList(x,expo_1,a))
+            elif order == 1:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x)",RooArgList(x,expo_1,a,b))
+
+            elif order == 2:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2)",RooArgList(x,expo_1,a,b,c))
+
+            elif order == 3:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**2)",RooArgList(x,expo_1,a,b,c,d))
+            
+            elif order == 4:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**2 + e*x**2)",RooArgList(x,expo_1,a,b,c,d,e))
+
+            elif order == 5:
+
+                background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**2 + e*x**2 + f*x**2)",RooArgList(x,expo_1,a,b,c,d,e,f))
+
 
         print p
-
 
         if data.Integral() != 0:
             nB = data.Integral()
@@ -896,7 +941,7 @@ for j in range(len(lxybins)):
 
         # '''
 
-        polytype = "bernexpo"
+        polytype = "polyexpo"
 
         if numsideband < 0:
 
@@ -928,8 +973,11 @@ for j in range(len(lxybins)):
 
                 # get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
                 # get_chisq(poly="expo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
-                get_chisq(poly="bernexpo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
+                get_chisq(poly="polyexpo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
 
         # '''
+
+        # get_chisq(poly="polyexpo",order=0,mask=False,saveplot=True,sigshape="dcbg")
+
 
 os.chdir("./..")
