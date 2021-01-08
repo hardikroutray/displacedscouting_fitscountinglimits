@@ -45,7 +45,7 @@ masseslist = [0.2, 0.202, 0.204, 0.206, 0.208, 0.21, 0.212, 0.214, 0.216, 0.218,
 
 masseslist = [0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 
-masseslist = [25]
+masseslist = [4.5]
 
 print len(masseslist)
 
@@ -75,7 +75,7 @@ tree_mudata.Add("/cms/routray/data_subset_pass_all.root")
 # tree_mudata.Print()
 
 # lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
-lxybins = np.array([[1.0,2.4]])
+lxybins = np.array([[0.2,1.0]])
 #print lxybins[0,0], lxybins[0,1]
 
 mu = mass
@@ -255,42 +255,63 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,expo_1,a,b,c,d,e,f))
 
 
-        if poly == "expo^poly":    
 
-            # expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
+        # if poly == "expo^poly":    
 
-            a = ROOT.RooRealVar("a","a",0.1,-100000000000,10000000000)
-            b = ROOT.RooRealVar("b","b",0.1,-10000000000,10000000000)
-            c = ROOT.RooRealVar("c","c",0.1,-10000000000,10000000000)
-            d = ROOT.RooRealVar("d","d",0.1,-10000000000,1000000000)
-            e = ROOT.RooRealVar("e","e",0.1,-10000000000,1000000000)
-            f = ROOT.RooRealVar("f","f",0.1,-10000000000,1000000000)
-            g = ROOT.RooRealVar("g","g",0.1,-10000000000,1000000000)
+        #     # expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
+
+        #     a = ROOT.RooRealVar("a","a",0.1,-5000,5000)
+        #     b = ROOT.RooRealVar("b","b",0.1,-5000,5000)
+        #     c = ROOT.RooRealVar("c","c",0.1,-5000,5000)
+        #     d = ROOT.RooRealVar("d","d",0.1,-5000,5000)
+        #     e = ROOT.RooRealVar("e","e",0.1,-5000,5000)
+        #     f = ROOT.RooRealVar("f","f",0.1,-5000,5000)
+        #     g = ROOT.RooRealVar("g","g",0.1,-5000,5000)
 
 
-            if order == 0:
+        #     if order == 0:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(a)",RooArgList(x,a))
+        #         background = ROOT.RooGenericPdf("background","TMath::Exp(a)",RooArgList(x,a))
 
-            elif order == 1:
+        #     elif order == 1:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x)",RooArgList(x,a,b))
+        #         background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*(x-{})".format(xfitdown),RooArgList(x,a,b))
 
-            elif order == 2:
+        #     elif order == 2:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2)",RooArgList(x,a,b,c))
+        #         background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*(x-{}) + c*(x-{})**2)".format(xfitdown,xfitdown),RooArgList(x,a,b,c))
 
-            elif order == 3:
+        #     elif order == 3:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2 + d*x**3)",RooArgList(x,a,b,c,d))
+        #         background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*(x-{}) + c*(x-{})**2 + d*(x-{})**3)".format(xfitdown,xfitdown,xfitdown),RooArgList(x,a,b,c,d))
             
-            elif order == 4:
+        #     elif order == 4:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2 + d*x**3 + e*x**4)",RooArgList(x,a,b,c,d,e))
+        #         background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*(x-{}) + c*(x-{})**2 + d*(x-{})**3 + e*(x-{})**4)".format(xfitdown,xfitdown,xfitdown,xfitdown),RooArgList(x,a,b,c,d,e))
 
-            elif order == 5:
+        #     elif order == 5:
 
-                background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,a,b,c,d,e,f))
+        #         background = ROOT.RooGenericPdf("background","TMath::Exp(a + b*(x-{}) + c*(x-{})**2 + d*(x-{})**3 + e*(x-{})**4 + f*(x-{})**5)".format(xfitdown,xfitdown,xfitdown,xfitdown,xfitdown),RooArgList(x,a,b,c,d,e,f))
+
+                
+        if poly == "expo^poly":
+
+            expstr = ""
+            params = [x]
+            for i in range(order+1):
+                pname = "p{}".format(i)
+                p = ROOT.RooRealVar(pname,pname,0.1,-5000,5000)
+                params.append(p)
+                if i == 0:
+                    expstr += pname
+                else:
+                    expstr += " + {pname}*(x-{shift})**{power}".format(pname=pname, shift=xfitdown, power=i)
+            funcstr = "TMath::Exp({})".format(expstr)
+            print(funcstr, params)
+            background = ROOT.RooGenericPdf("background",funcstr,RooArgList(*params))
+
+
+
 
 
 
@@ -306,8 +327,6 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
         if data.Integral() == 0:
             background_norm = ROOT.RooRealVar("background_norm","background_norm",nB,0,0.000001)
 
-
-	# nB = data.Integral()
         # if nB != 0:
         #     background_norm = ROOT.RooRealVar("background_norm","background_norm",nB,0.9*nB,1.1*nB)
         # else:
@@ -446,7 +465,9 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
 		if (KS_Ts.limit < 10000):
 			KS_Vs.append(KS_Ts.limit)
 
-        os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order,250))
+        goftoys = 250
+
+        os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order,goftoys))
         KS_F = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".123456.root")
         KS_T = KS_F.Get("limit")
         KS_V = []
@@ -487,12 +508,12 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 # AddCMSLumi(ROOT.gPad, 10.1, "pvalue")
 
 		# ROOT.gStyle.SetEndErrorSize(0)
-		# xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-order)) + ", p = %.3f" % (integral / 250) ))
+		# xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-order)) + ", p = %.3f" % (integral / goftoys) ))
 
                 if poly != "expo" and poly != "powerlaw":
-                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-order)) + ", p = %.3f" % (integral / 250) ))
+                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-order)) + ", p = %.3f" % (integral / goftoys) ))
                 else:
-                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-1)) + ", p = %.3f" % (integral / 250) ))
+                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-1)) + ", p = %.3f" % (integral / goftoys) ))
 
 		data_obs.plotOn(xframe2, ROOT.RooFit.Name("data"))
 		model.plotOn(xframe2,ROOT.RooFit.LineColor(2), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Name("bkg"), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
@@ -571,7 +592,7 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 legend.SetBorderSize(0)
                 legend.SetFillColor(0)
                 legend.AddEntry(KS_plot, "Toy Models", "pe")
-                legend.AddEntry(KS_mk, "Bg, p = %.3f" % (integral / 250), "l")
+                legend.AddEntry(KS_mk, "Bg, p = %.3f" % (integral / goftoys), "l")
 
                 C_KS = ROOT.TCanvas()
                 C_KS.cd()
@@ -653,18 +674,18 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 ggphipoly = open("mass{}.csv".format(mass), "a")
 
                 # ggphipoly.write(" mass\tlxy bin\tpoly order\tchi2\tndof\tpvalue\tbias\tbias_err\tExpected 2.5%: r < \tExpected 16.0%: r < \tExpected 50.0%: r < \tExpected 84.0%: r < \tExpected 97.5%: r < \tObserved Limit\n")
-                # ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/250, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))  
+                # ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/goftoys, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))  
 
                 if poly != "expo" and poly != "powerlaw":
-                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/250, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
+                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/goftoys, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
                 else:
-                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - 1 , integral/250, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
+                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - 1 , integral/goftoys, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
 
 
 
                 # ggphipoly = open("mass{}_v0.csv".format(mass), "a")
                 # ggphipoly.write(" mass;lxy bin;poly order;chi2;ndof;pvalue;bias;bias_err;Expected 2.5%: r < ;Expected 16.0%: r < ;Expected 50.0%: r < ;Expected 84.0%: r < ;Expected 97.5%: r < ;Observed Limit\n")
-                # ggphipoly.write(" {};{} - {};{}{};{};{};{};{};{};{};{};{};{};{};{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/250,bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
+                # ggphipoly.write(" {};{} - {};{}{};{};{};{};{};{};{};{};{};{};{};{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/goftoys,bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
 
         
         # print KS_Vs[0], KS_plot.FindBin(KS_Vs[0]), integral
@@ -689,7 +710,7 @@ def get_chisq(poly="bernstein",order=1,mask=False,saveplot=False,sigshape="dcbg"
                 os.system('rm higgsCombineanalysis5.000000.GenerateOnly.mH{}.123456.root'.format(mass))
                 os.system('rm fitDiagnosticsanalysis5.000000.root')
 
-	return (chisq,nll,coml_exp,KS_Vs[0],integral/250,rss,xssq)
+	return (chisq,nll,coml_exp,KS_Vs[0],integral/goftoys,rss,xssq)
 
 
 
@@ -978,7 +999,7 @@ for j in range(len(lxybins)):
         print "number of sideband events", numsideband
         print "number of bins", numbins
 
-        # '''
+        '''
 
         polytype = "expo*poly"
 
@@ -1011,8 +1032,9 @@ for j in range(len(lxybins)):
                 print bestorder
 
                 get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
-
-        polytype = "expo^poly"
+        '''
+        # '''
+        polytype = "bernstein"
 
         if numsideband < 0:
 
@@ -1028,6 +1050,7 @@ for j in range(len(lxybins)):
                 numbins = len(x_unmasked) 
 
                 rss = 0
+                nll = 0
                 for o in range(10):
                         rss0 = rss
                         # residuals = get_chisq(poly=polytype,order=o+1,mask=False,saveplot=False,sigshape="dcbg")
@@ -1036,18 +1059,44 @@ for j in range(len(lxybins)):
                         ndf = numbins - (o)
                         fvalue = (rss0 - rss)/(rss/ndf)                                                                                                                                     
                         fcrit = scipy.stats.f.ppf(q=1-0.05, dfn=1, dfd=ndf) 
-                
-                        if o > 0 and fvalue < fcrit:                                                                                                                                      
-                                break                                                                                                                                                      
+                        
+                        p_value = scipy.stats.f.cdf(fvalue, dfn = 1, dfd = ndf)
+
+                        print fvalue, fcrit, p_value
+                        
+                        # if o > 0 and fvalue < fcrit:                                                                                                                                      
+                        #         break                                                           
+                        
+                        nll0 = nll
+                        nll = residuals[1]
+                        prob = ROOT.TMath.Prob(2*(nll0 - nll),1)
+                        print 2*(nll0 - nll), prob
+                        
+                        if o == 1:
+                            exit()
+
+                        # if o > 0 and prob > 0.05:
+                        #     break
+                            
+
                 bestorder = o - 1                                                                                                                                                       
                 print bestorder
 
-                # get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
-                # get_chisq(poly="expo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
                 get_chisq(poly=polytype,order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
+                # get_chisq(poly="expo",order=bestorder,mask=False,saveplot=True,sigshape="dcbg")
+
+
 
 
         # '''
+        # polytype = "bernstein"
+        # get_chisq(poly=polytype,order=0,mask=False,saveplot=True,sigshape="dcbg")
+        # get_chisq(poly=polytype,order=1,mask=False,saveplot=True,sigshape="dcbg")
+        # get_chisq(poly=polytype,order=2,mask=False,saveplot=True,sigshape="dcbg")
+        # get_chisq(poly=polytype,order=3,mask=False,saveplot=True,sigshape="dcbg")
+        # get_chisq(poly=polytype,order=4,mask=False,saveplot=True,sigshape="dcbg")
+
+
 
         # get_chisq(poly="expo^poly",order=1,mask=False,saveplot=True,sigshape="dcbg")
 
