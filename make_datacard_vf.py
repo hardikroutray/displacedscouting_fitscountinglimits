@@ -210,7 +210,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
             background = ROOT.RooProdPdf("background","background",RooArgList(expo,bern))
 
 
-        if poly == "expo*poly":
+        if poly == "expomulpoly":
 
             expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
 
@@ -246,7 +246,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
                 background = ROOT.RooGenericPdf("background","TMath::Exp(expo_1*x) * (a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,expo_1,a,b,c,d,e,f))
 
 
-        if poly == "expo^poly":
+        if poly == "expopowpoly":
 
             expstr = ""
             params = [x]
@@ -740,7 +740,6 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         pow_1 = ROOT.RooRealVar("pow_1","exponent of power law",-10000000.,10000000.)
         backgroundpowlaw = ROOT.RooGenericPdf("backgroundpowlaw","TMath::Power(@0,@1)",RooArgList(x,pow_1))
 
-        # if poly == "expo*poly":
 
         expo_2 = ROOT.RooRealVar("expo_2","slope of exponential",-10000000.,10000000.)
 
@@ -776,7 +775,6 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
 
             backgroundexpmulpoly = ROOT.RooGenericPdf("backgroundexpmulpoly","TMath::Exp(expo_2*x) * (a + b*x + c*x**2 + d*x**3 + e*x**4 + f*x**5)",RooArgList(x,expo_2,a,b,c,d,e,f))
 
-        # if poly == "expo^poly":
 
         expstr = ""
         params = [x]
@@ -1668,26 +1666,9 @@ for j in range(len(lxybins)):
         print "number of sideband events", numsideband
         print "number of bins", numbins
 
-
         bestbernorder = ftest(polytype="bernstein")
-        bestexpmulpolyorder = ftest(polytype="expo*poly")
-        bestexppowpolyorder = ftest(polytype="expo^poly")
-
-        # if bestbernorder != 0:
-        #     probberndown = prob(polytype="bernstein",o=bestbernorder-1)
-        # else:
-        #     probberndown = 0
-
-        # probbern = prob(polytype="bernstein",o=bestbernorder)
-        # probbernup = prob(polytype="bernstein",o=bestbernorder+1)
-        # probexpmulpoly = prob(polytype="expo*poly",o=bestexpmulpolyorder)
-        # probexppowpoly = prob(polytype="expo^poly",o=bestexppowpolyorder)
-
-        # print bestbernorder, bestexpmulpolyorder, bestexppowpolyorder
-
-        # print "The probabilty of best bern, expo*poly, expo^poly", probbern, probexpmulpoly, probexppowpoly
-        # print "The probabilty of best bern, berndown, bernup", probbern, probberndown, probbernup
-
+        bestexpmulpolyorder = ftest(polytype="expomulpoly")
+        bestexppowpolyorder = ftest(polytype="expopowpoly")
  
         if bestbernorder != 0:
             pvalueberndown = get_chisq(poly="bernstein",order=bestbernorder-1,mask=False,saveplot=False,sigshape="dcbg")[4]
@@ -1697,18 +1678,15 @@ for j in range(len(lxybins)):
         pvaluebern = get_chisq(poly="bernstein",order=bestbernorder,mask=False,saveplot=False,sigshape="dcbg")[4]
         pvaluebernup = get_chisq(poly="bernstein",order=bestbernorder+1,mask=False,saveplot=False,sigshape="dcbg")[4]
         pvalueexpo = get_chisq(poly="expo",order=1,mask=False,saveplot=False,sigshape="dcbg")[4]
-        pvalueexpmulpoly = get_chisq(poly="expo*poly",order=bestexpmulpolyorder,mask=False,saveplot=False,sigshape="dcbg")[4]
-        pvalueexppowpoly = get_chisq(poly="expo^poly",order=bestexppowpolyorder,mask=False,saveplot=False,sigshape="dcbg")[4]
+        pvalueexpmulpoly = get_chisq(poly="expomulpoly",order=bestexpmulpolyorder,mask=False,saveplot=False,sigshape="dcbg")[4]
+        pvalueexppowpoly = get_chisq(poly="expopowpoly",order=bestexppowpolyorder,mask=False,saveplot=False,sigshape="dcbg")[4]
 
         print bestbernorder, bestexpmulpolyorder, bestexppowpolyorder
 
         print "The gof pvalue of best bern, berndown, bernup", pvaluebern, pvalueberndown, pvaluebernup
         print "The gof pvalue of best bern, expo*poly, expo^poly", pvaluebern, pvalueexpmulpoly, pvalueexppowpoly
 
-        # exit()
 
-
-        # '''
         if bestbernorder != 0:
 
             makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=bestbernorder-1,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="bern")
@@ -1717,87 +1695,5 @@ for j in range(len(lxybins)):
             
              makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=bestbernorder,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="bern")
             
-        # '''
-
-        # bias0 = []                                                                              
-        # bias0err = []                                                                            
-        # bias2 = []                                                                              
-        # bias2err = []   
-
-        # if bestbernorder != 0:
-        #     orderberndownval = bestbernorder - 1
-        # else:
-        #     orderberndownval = bestbernorder
-
-
-        # if data.Integral() != 0:
-        
-
-        #     makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="bern")
-        #     makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=True,testpoly="bernup",toypoly="bern")
-
-        #     if orderberndownval != bestbernorder:
-        #         makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=True,testpoly="berndown",toypoly="bern")
-
-        #     makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=True,testpoly="expmulpoly",toypoly="bern")
-        # # makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=True,testpoly="exppowpoly",toypoly="bern")
-
-
-        # else:
-
-        #     makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=1,orderexppowpoly=1,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="bern")
-        #     makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=1,orderexppowpoly=1,sigshape="dcbg",dobiastest=True,testpoly="bernup",toypoly="bern")
-        #     if orderberndownval != bestbernorder:
-        #         makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,orderexpmulpoly=1,orderexppowpoly=1,sigshape="dcbg",dobiastest=True,testpoly="berndown",toypoly="bern")
-
-
-        '''
-
-        if bestbernorder != 0:
-            orderberndownval = bestbernorder - 1
-        else:
-            orderberndownval = bestbernorder
-
-
-        bias0 = []
-        bias0err = []
-
-        bias2 = []
-        bias2err = []
-
-        bias0.append(masses[0])
-        bias0err.append(masses[0])
-        
-        bias2.append(masses[0])
-        bias2err.append(masses[0])
-
-        makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="bern")
-        # makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="expo")
-        # makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="powlaw")
-        makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="bernup")
-        makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=orderberndownval,sigshape="dcbg",dobiastest=True,testpoly="bern",toypoly="berndown")
-
-        dfbias0 = pd.DataFrame([bias0],columns=['mass', 'bernonbernbias', 'bernonbernupbias', 'bernonberndownbias'])
-        print dfbias0
-
-        dfbias0std = pd.DataFrame([bias0err],columns=['mass', 'bernonbernbiasstd', 'bernonbernupbiasstd', 'bernonberndownbiasstd'])
-        print dfbias0std
-
-        dfbias2 = pd.DataFrame([bias2],columns=['mass', 'bernonbernbias', 'bernonbernupbias', 'bernonberndownbias'])
-        print dfbias2
-
-        dfbias2std = pd.DataFrame([bias2err],columns=['mass', 'bernonbernbiasstd', 'bernonbernupbiasstd', 'bernonberndownbiasstd'])
-        print dfbias2std
-
-        if not os.path.exists("../csvlimits1"):
-            os.makedirs("../csvlimits1")
-
-        dfbias0.to_csv('../csvlimits1/bias0_mass{}_lxy{}_{}_v0.csv'.format(mass,lxybins[j,0],lxybins[j,1]),index=False)
-        dfbias0std.to_csv('../csvlimits1/bias0std_mass{}_lxy{}_{}_v0.csv'.format(mass,lxybins[j,0],lxybins[j,1]),index=False)
-
-        dfbias2.to_csv('../csvlimits1/bias2_mass{}_lxy{}_{}_v0.csv'.format(mass,lxybins[j,0],lxybins[j,1]),index=False)
-        dfbias2std.to_csv('../csvlimits1/bias2std_mass{}_lxy{}_{}_v0.csv'.format(mass,lxybins[j,0],lxybins[j,1]),index=False)
-        '''
-
 
 os.chdir("./..")
