@@ -73,8 +73,8 @@ tree_mudata = ROOT.TChain('t')
 tree_mudata.Add("/cms/routray/data_subset_pass_all.root")
 # tree_mudata.Print()
 
-# lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
-lxybins = np.array([[0.0,0.2]])
+lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
+# lxybins = np.array([[0.2,1.0]])
 # lxybins = np.array([[1.0,2.4],[3.1,7.0],[7.0,11.0]])
 #print lxybins[0,0], lxybins[0,1]
 
@@ -1574,8 +1574,7 @@ def ftest(polytype="bernstein"):
         # fvalue = (rss0 - rss)/(rss/ndf)                                                                                                                                     
         # fcrit = scipy.stats.f.ppf(q=1-0.05, dfn=1, dfd=ndf) 
                 
-        # if o > 0 and fvalue < fcrit:                                                          
-                                                        
+        # if o > 0 and fvalue < fcrit:                                                                                                                  
         #     break                                                                             
             
         nll0 = nll
@@ -1615,6 +1614,20 @@ h1 = []
 for j in range(len(lxybins)):
 
         print "Looking at lxy bin----------",lxybins[j,0], "-", lxybins[j,1], "----------------"   
+        mu = mass
+        sig = 0.01*mass
+        gam = 0.01*mass
+
+        binwidth = sig/10
+        ndecimal = num_after_point(binwidth) + 1
+
+        xsigup = mu + 2*sig
+        xsigdown = mu - 2*sig
+
+        xfitup = mu + 5*sig
+        xfitdown = mu - 5*sig
+
+        bins = int(round((xfitup-xfitdown)/binwidth))
         
         ns = 100
 
