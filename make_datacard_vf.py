@@ -47,11 +47,11 @@ masseslist = [0.65,0.9,1.8,2.52,4.12,5.5,8,12,0.2, 0.202, 0.204, 0.206, 0.208, 0
 
 # masseslist = [0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 
-masseslist = [2]
+masseslist = [2.2]
 
 masses = []
 for i in range(len(masseslist)):
-    if (masseslist[i] > 0.41 and masseslist[i] < 0.515) or (masseslist[i] > 0.495 and masseslist[i] < 0.61) or (masseslist[i] > 0.695 and masseslist[i] < 0.88) or (masseslist[i] > 0.915 and masseslist[i] < 1.13) or (masseslist[i] > 2.81 and masseslist[i] < 4.09) or (masseslist[i] > 8.59 and masseslist[i] < 11.27):
+    if (masseslist[i] < 0.3) or (masseslist[i] > 0.41 and masseslist[i] < 0.515) or (masseslist[i] > 0.495 and masseslist[i] < 0.61) or (masseslist[i] > 0.695 and masseslist[i] < 0.88) or (masseslist[i] > 0.915 and masseslist[i] < 1.13) or (masseslist[i] > 2.81 and masseslist[i] < 4.09) or (masseslist[i] > 8.59 and masseslist[i] < 11.27):
         continue
     masses.append(masseslist[i])
 
@@ -73,8 +73,8 @@ tree_mudata = ROOT.TChain('t')
 tree_mudata.Add("/cms/routray/data_subset_pass_all.root")
 # tree_mudata.Print()
 
-lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
-# lxybins = np.array([[0.0,0.2]])
+# lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
+lxybins = np.array([[0.0,0.2]])
 # lxybins = np.array([[1.0,2.4],[3.1,7.0],[7.0,11.0]])
 #print lxybins[0,0], lxybins[0,1]
 
@@ -279,21 +279,39 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
 
 	# ROOT.RooMsgService.instance().setSilentMode(ROOT.kTRUE)
 
+	# if mask:
+
+	# 	result = ROOT.RooFitResult(model.fitTo(data_obs, ROOT.RooFit.Range("R1,R2"), ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
+	# 	model.fitTo(data_obs,ROOT.RooFit.Range("R1,R2"))
+	
+	# else:
+
+	# 	result = ROOT.RooFitResult(model.fitTo(data_obs, ROOT.RooFit.Range("Full"), ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
+	# 	model.fitTo(data_obs,ROOT.RooFit.Range("Full"))
+
+
 	if mask:
 
-		result = ROOT.RooFitResult(model.fitTo(data_obs, ROOT.RooFit.Range("R1,R2"), ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-		model.fitTo(data_obs,ROOT.RooFit.Range("R1,R2"))
+		background.fitTo(data_obs,ROOT.RooFit.Range("R1,R2"),ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+		background.fitTo(data_obs,ROOT.RooFit.Range("R1,R2"),ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+		result = ROOT.RooFitResult(background.fitTo(data_obs, ROOT.RooFit.Range("R1,R2"), ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
+
 	
 	else:
 
-		result = ROOT.RooFitResult(model.fitTo(data_obs, ROOT.RooFit.Range("Full"), ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-		model.fitTo(data_obs,ROOT.RooFit.Range("Full"))
+		background.fitTo(data_obs,ROOT.RooFit.Range("Full"),ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+		background.fitTo(data_obs,ROOT.RooFit.Range("Full"),ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+                result = ROOT.RooFitResult(background.fitTo(data_obs, ROOT.RooFit.Range("Full"), ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
+	
+
+        status = result.status()
+        print "fit status is ", status
 
 	bkg_component = ROOT.RooArgSet(background)  
 	xframe = x.frame(ROOT.RooFit.Title("Data Fit"))
         data_obs.plotOn(xframe, ROOT.RooFit.Name("data"))
-	model.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
-        model.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
+	# model.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
+        background.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
 
         if poly != "expo" and poly != "powerlaw":
             chisq = xframe.chiSquare(order)
@@ -302,7 +320,10 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
         nll = result.minNll()
 
         # model.plotOn(xframe,ROOT.RooFit.VisualizeError(result,1,ROOT.kFALSE), ROOT.RooFit.DrawOption("F"), ROOT.RooFit.Name("errorband"), ROOT.RooFit.FillColor(ROOT.kOrange), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
-        model.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
+        # model.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
+        background.plotOn(xframe,ROOT.RooFit.LineColor(3),ROOT.RooFit.Name("bkg"), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
+
+
         
         xframe.Print("v")
 
@@ -333,12 +354,12 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
         
 	myWS = ROOT.RooWorkspace("myWS", "workspace")                                                                                                                                                      
         getattr(myWS,'import')(data_obs)                                                                                                    
-        # getattr(myWS,'import')(background)                                                                                                
+        getattr(myWS,'import')(background)                                                                                                
         getattr(myWS,'import')(signal) 
-        getattr(myWS,'import')(model)
+        # getattr(myWS,'import')(model)
 
         # getattr(myWS,'import')(model,RooCmdArg())
-        # getattr(myWS, 'import')(background_norm)
+        getattr(myWS, 'import')(background_norm)
         # getattr(myWS, 'import')(sig_norm)
         # getattr(myWS, 'factory')("nS".format(nS))
         # getattr(myWS, 'factory')("nB".format(nB))        
@@ -395,6 +416,8 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
                 elif line[:15] == 'Expected 97.5%:':                                                                                                                                                       
                         coml_2su = float(line[19:])     
 
+
+        
 	os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt".format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order))
 	KS_Fs = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".root")
 	KS_Ts = KS_Fs.Get("limit")
@@ -405,7 +428,9 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
 		if (KS_Ts.limit < 10000):
 			KS_Vs.append(KS_Ts.limit)
 
-        os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order,25))
+
+        goftoys = 25
+        os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1],poly,order,goftoys))
         KS_F = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".123456.root")
         KS_T = KS_F.Get("limit")
         KS_V = []
@@ -448,9 +473,9 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
 		# ROOT.gStyle.SetEndErrorSize(0)
 		
                 if poly != "expo" and poly != "powerlaw":
-                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-order)) + ", p = %.3f" % (integral / 25) ))
+                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-order)) + ", p = %.3f" % (integral / goftoys) ))
 	        else:
-                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-1)) + ", p = %.3f" % (integral / 25) ))
+                    xframe2 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit, ".format(mass,lxybins[j,0], lxybins[j,1],poly,order) + "#chi^{2}/ndf = " + "%2f" %(xssq/(numbins-1)) + ", p = %.3f" % (integral / goftoys) ))
                 
                 data_obs.plotOn(xframe2, ROOT.RooFit.Name("data"))
 		model.plotOn(xframe2,ROOT.RooFit.LineColor(2), ROOT.RooFit.LineStyle(2), ROOT.RooFit.Name("bkg"), ROOT.RooFit.Range("Full"), ROOT.RooFit.NormRange("Full"))
@@ -529,7 +554,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
                 legend.SetBorderSize(0)
                 legend.SetFillColor(0)
                 legend.AddEntry(KS_plot, "Toy Models", "pe")
-                legend.AddEntry(KS_mk, "Bg, p = %.3f" % (integral / 25), "l")
+                legend.AddEntry(KS_mk, "Bg, p = %.3f" % (integral / goftoys), "l")
 
                 C_KS = ROOT.TCanvas()
                 C_KS.cd()
@@ -546,7 +571,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
                 C_KS.Print("bias_signalinjection_pvalue/goodnessoffit_mass{}_lxy{}_{}_{}_order{}.png".format(mass, lxybins[j,0], lxybins[j,1],poly,order))
 
                 INJ = [2.]
-                ntoys = 500
+                ntoys = 10
                 cardname = "simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt".format(mass, lxybins[j,0],lxybins[j,1],poly,order)
                 name = "analysis"
 
@@ -610,16 +635,10 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
                 ggphipoly.write(" mass\tlxy bin\tpoly order\tchi2\tndof\tpvalue\tbias\tbias_err\tExpected 2.5%: r < \tExpected 16.0%: r < \tExpected 50.0%: r < \tExpected 84.0%: r < \tExpected 97.5%: r < \tObserved Limit\n")
                 
                 if poly != "expo" and poly != "powerlaw":
-                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/25, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))  
+                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/goftoys, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))  
                 else:
-                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - 1 , integral/25, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
-
-                # ggphipoly = open("mass{}_v0.csv".format(mass), "a")
-                # ggphipoly.write(" mass;lxy bin;poly order;chi2;ndof;pvalue;bias;bias_err;Expected 2.5%: r < ;Expected 16.0%: r < ;Expected 50.0%: r < ;Expected 84.0%: r < ;Expected 97.5%: r < ;Observed Limit\n")
-                # ggphipoly.write(" {};{} - {};{}{};{};{};{};{};{};{};{};{};{};{};{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - order , integral/25,bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
-
+                    ggphipoly.write(" {}\t{} - {}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, numbins - 1 , integral/goftoys, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
         
-        # print KS_Vs[0], KS_plot.FindBin(KS_Vs[0]), integral
 	if saveplot != 1: 
 		os.system('rm simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.txt'.format(mass, lxybins[j,0],lxybins[j,1],poly,order))
 		os.system('rm simple-shapes-TH1_mass{}_Lxy{}_{}_{}_order{}.root'.format(mass, lxybins[j,0],lxybins[j,1],poly,order))
@@ -645,7 +664,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
                 os.system('rm fitDiagnosticsanalysis1.000000.root')
 
 
-	return (chisq,nll,coml_exp,KS_Vs[0],integral/25,rss,xssq)
+	return (chisq,nll,coml_exp,KS_Vs[0],integral/goftoys,rss,xssq,status)
 
 
 def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpmulpoly=1,orderexppowpoly=1,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="expo"):
@@ -734,14 +753,14 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
                 parcheb.add(pcheb[i])
         backgroundcheb = ROOT.RooChebychev("backgroundcheb","backgroundcheb", x, parcheb)
 
-        expo_1 = ROOT.RooRealVar("expo_1","slope of exponential",-10000000.,10000000.)
+        expo_1 = ROOT.RooRealVar("expo_1","slope of exponential_1",-10000000.,10000000.)
         backgroundexpo = ROOT.RooExponential("backgroundexpo","backgroundexpo",x,expo_1)
 
         pow_1 = ROOT.RooRealVar("pow_1","exponent of power law",-10000000.,10000000.)
         backgroundpowlaw = ROOT.RooGenericPdf("backgroundpowlaw","TMath::Power(@0,@1)",RooArgList(x,pow_1))
 
 
-        expo_2 = ROOT.RooRealVar("expo_2","slope of exponential",-10000000.,10000000.)
+        expo_2 = ROOT.RooRealVar("expo_2","slope of exponential_2",-10000000.,10000000.)
 
         a = ROOT.RooRealVar("a","a",1,-1000000000,100000000)
         b = ROOT.RooRealVar("b","b",1,-100000000,100000000)
@@ -817,35 +836,40 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
 
         # norm = ROOT.RooRealVar("norm","norm",nB,0.9*nB,1.1*nB)
 
+        backgroundbern.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+        backgroundbern.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
         resultbern = ROOT.RooFitResult(backgroundbern.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-        backgroundbern.fitTo(data_obs)
 
+        backgroundbernup.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+        backgroundbernup.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
         resultbernup = ROOT.RooFitResult(backgroundbernup.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-        backgroundbernup.fitTo(data_obs)
 
+        backgroundberndown.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+        backgroundberndown.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
         resultberndown = ROOT.RooFitResult(backgroundberndown.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-        backgroundberndown.fitTo(data_obs)
 
         # resultcheb = ROOT.RooFitResult(backgroundcheb.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
         # backgroundcheb.fitTo(data_obs)
 
         # resultpol = ROOT.RooFitResult(backgroundpol.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))                                                                                                                                         
         # backgroundpol.fitTo(data_obs)                                                         
-
-
         if data.Integral() != 0:
                                             
+            backgroundexpo.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+            backgroundexpo.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
             resultexpo = ROOT.RooFitResult(backgroundexpo.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-            backgroundexpo.fitTo(data_obs)
 
+            backgroundpowlaw.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+            backgroundpowlaw.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
             resultpowlaw = ROOT.RooFitResult(backgroundpowlaw.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-            backgroundpowlaw.fitTo(data_obs)
 
+            backgroundexpmulpoly.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+            backgroundexpmulpoly.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
             resultexpmulpoly = ROOT.RooFitResult(backgroundexpmulpoly.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-            backgroundexpmulpoly.fitTo(data_obs)
 
+            backgroundexppowpoly.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
+            backgroundexppowpoly.fitTo(data_obs,ROOT.RooFit.Minimizer("Minuit2","Migrad"))
             resultexppowpoly = ROOT.RooFitResult(backgroundexppowpoly.fitTo(data_obs, ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.Minimizer("Minuit2","Migrad")))
-            backgroundexppowpoly.fitTo(data_obs)
 
         c0 = ROOT.TCanvas("c0","c0")
         c0.cd()
@@ -857,7 +881,6 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
             backgroundexpo.plotOn(xframe0,ROOT.RooFit.LineColor(9),ROOT.RooFit.Name("bkg_expo"), ROOT.RooFit.LineStyle(2))    
             backgroundexpmulpoly.plotOn(xframe0,ROOT.RooFit.LineColor(46),ROOT.RooFit.Name("bkg_expmulpoly"), ROOT.RooFit.LineStyle(2))
             backgroundexppowpoly.plotOn(xframe0,ROOT.RooFit.LineColor(30),ROOT.RooFit.Name("bkg_exppowpoly"), ROOT.RooFit.LineStyle(2))
-
     
         backgroundberndown.plotOn(xframe0,ROOT.RooFit.LineColor(7),ROOT.RooFit.Name("bkg_bern_down"), ROOT.RooFit.LineStyle(2))
         backgroundbernup.plotOn(xframe0,ROOT.RooFit.LineColor(4),ROOT.RooFit.Name("bkg_bern_up"), ROOT.RooFit.LineStyle(2))
@@ -1036,22 +1059,22 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         
         if data.Integral() != 0:
 
-            if pvaluebernup > 0.01:
+            if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 backgroundbernup.plotOn(xframe1,ROOT.RooFit.LineColor(4),ROOT.RooFit.Name("bkg_bern_up"), ROOT.RooFit.LineStyle(2))
-            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern:
+            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 backgroundberndown.plotOn(xframe1,ROOT.RooFit.LineColor(7),ROOT.RooFit.Name("bkg_bern_down"), ROOT.RooFit.LineStyle(2))
-            if pvalueexpo > 0.01:
-                backgroundexpo.plotOn(xframe1,ROOT.RooFit.LineColor(9),ROOT.RooFit.Name("bkg_expo"), ROOT.RooFit.LineStyle(2))
-            if pvalueexpmulpoly > 0.01:
+            if pvalueexpo > 0.01 and fitstatusexpo == 0:
+                backgroundexpo.plotOn(xframe1,ROOT.RooFit.LineColor(28),ROOT.RooFit.Name("bkg_expo"), ROOT.RooFit.LineStyle(2))
+            if pvalueexpmulpoly > 0.01 and fitstatusexpmulpoly == 0:
                 backgroundexpmulpoly.plotOn(xframe1,ROOT.RooFit.LineColor(46),ROOT.RooFit.Name("bkg_expmulpoly"), ROOT.RooFit.LineStyle(2))
-            if pvalueexppowpoly > 0.01:
+            if pvalueexppowpoly > 0.01 and fitstatusexppowpoly == 0:
                 backgroundexppowpoly.plotOn(xframe1,ROOT.RooFit.LineColor(30),ROOT.RooFit.Name("bkg_exppowpoly"), ROOT.RooFit.LineStyle(2))
 
         else:
 
-            if pvaluebernup > 0.01:
+            if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 backgroundbernup.plotOn(xframe1,ROOT.RooFit.LineColor(4),ROOT.RooFit.Name("bkg_bern_up"), ROOT.RooFit.LineStyle(2))
-            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern:
+            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 backgroundberndown.plotOn(xframe1,ROOT.RooFit.LineColor(7),ROOT.RooFit.Name("bkg_bern_down"), ROOT.RooFit.LineStyle(2))
 
 
@@ -1067,25 +1090,26 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         leg1.AddEntry(xframe0.findObject("data"), "Data [{} < lxy < {}]".format(lxybins[j,0], lxybins[j,1]), "pe")
 
         if data.Integral() != 0:
-            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern:
+            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_down"), "#color[1]{%s Fit}" %("bernstein" + "(" + str(orderberndown) + ")"), "l")
         else:
-            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern:
+            if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_down"), "#color[1]{%s Fit}" %("bernstein" + "(" + str(orderberndown) + ")"), "l")
  
         leg1.AddEntry(xframe1.findObject("bkg_bern"), "#color[2]{%s Fit}" %("bernstein"  + "(" + str(orderbern) + ")" + "(best order)"), "l")
 
         if data.Integral() != 0:
-            if pvaluebernup > 0.01:
+            if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_up"), "#color[1]{%s Fit}" %("bernstein"  + "(" + str(orderbernup) + ")"), "l")
-            if pvalueexpo > 0.01:
+            if pvalueexpo > 0.01 and fitstatusexpo == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_expo"), "#color[1]{%s Fit}" %("exponential"), "l") 
-            if pvalueexpmulpoly > 0.01:
+            if pvalueexpmulpoly > 0.01 and fitstatusexpmulpoly == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_expmulpoly"), "#color[1]{%s Fit}" %("expo*pol" + "(" + str(orderexpmulpoly) + ")"), "l")
-            if pvalueexppowpoly > 0.01:
+            if pvalueexppowpoly > 0.01 and fitstatusexppowpoly == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_exppowpoly"), "#color[1]{%s Fit}" %("expo^pol" + "(" + str(orderexppowpoly) + ")"), "l")
         else:
-            leg1.AddEntry(xframe1.findObject("bkg_bern_up"), "#color[1]{%s Fit}" %("bernstein"  + "(" + str(orderbernup) + ")"), "l")
+            if pvaluebernup > 0.01 and fitstatusbernup == 0:
+                leg1.AddEntry(xframe1.findObject("bkg_bern_up"), "#color[1]{%s Fit}" %("bernstein"  + "(" + str(orderbernup) + ")"), "l")
 
         
         leg1.SetTextFont(42)
@@ -1105,7 +1129,7 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
             mypdfs.add(backgroundbernup)
             mypdfs.add(backgroundberndown)
             if data.Integral() != 0:
-                mypdfs.add(backgroundexpo)                                                      
+                mypdfs.add(backgroundexpo)                                                     
                 mypdfs.add(backgroundexpmulpoly)
                 mypdfs.add(backgroundexppowpoly)
 
@@ -1269,25 +1293,26 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         order = orderbern
         cat = ROOT.RooCategory("pdf_index{}".format(j+1),"Index of Pdf which is active")
         mypdfs = ROOT.RooArgList()
+
         mypdfs.add(backgroundbern)
 
         if data.Integral() != 0:
 
-            if pvaluebernup > 0.01: 
+            if pvaluebernup > 0.01 and fitstatusbernup == 0: 
                 mypdfs.add(backgroundbernup)
-            if pvalueberndown > 0.01 and pvalueberndown != 1 and orderberndown != orderbern:
+            if pvalueberndown > 0.01 and pvalueberndown != 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 mypdfs.add(backgroundberndown)
-            if pvalueexpo > 0.01:
+            if pvalueexpo > 0.01 and fitstatusexpo == 0:
                 mypdfs.add(backgroundexpo)
-            if pvalueexpmulpoly > 0.01:
+            if pvalueexpmulpoly > 0.01 and fitstatusexpmulpoly == 0:
                 mypdfs.add(backgroundexpmulpoly)
-            if pvalueexppowpoly > 0.01:
+            if pvalueexppowpoly > 0.01 and fitstatusexppowpoly == 0:
                 mypdfs.add(backgroundexppowpoly)
 
         else:
-            if pvaluebernup > 0.01:
+            if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 mypdfs.add(backgroundbernup)
-            if pvalueberndown > 0.01 and pvalueberndown != 1 and orderberndown != orderbern:
+            if pvalueberndown > 0.01 and pvalueberndown != 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 mypdfs.add(backgroundberndown)
 
         multipdf = ROOT.RooMultiPdf("roomultipdf","All Pdfs",cat,mypdfs)
@@ -1671,29 +1696,56 @@ for j in range(len(lxybins)):
         bestexppowpolyorder = ftest(polytype="expopowpoly")
  
         if bestbernorder != 0:
-            pvalueberndown = get_chisq(poly="bernstein",order=bestbernorder-1,mask=False,saveplot=False,sigshape="dcbg")[4]
+            residualsberndown = get_chisq(poly="bernstein",order=bestbernorder-1,mask=False,saveplot=False,sigshape="dcbg")
+
+        residualsbern = get_chisq(poly="bernstein",order=bestbernorder,mask=False,saveplot=False,sigshape="dcbg")
+        residualsbernup = get_chisq(poly="bernstein",order=bestbernorder+1,mask=False,saveplot=False,sigshape="dcbg")
+        residualsexpo = get_chisq(poly="expo",order=1,mask=False,saveplot=False,sigshape="dcbg")
+        residualsexpmulpoly = get_chisq(poly="expomulpoly",order=bestexpmulpolyorder,mask=False,saveplot=False,sigshape="dcbg")
+        residualsexppowpoly = get_chisq(poly="expopowpoly",order=bestexppowpolyorder,mask=False,saveplot=False,sigshape="dcbg")
+
+
+        if bestbernorder != 0:
+            pvalueberndown = residualsberndown[4]
         else:
             pvalueberndown = 0
 
-        pvaluebern = get_chisq(poly="bernstein",order=bestbernorder,mask=False,saveplot=False,sigshape="dcbg")[4]
-        pvaluebernup = get_chisq(poly="bernstein",order=bestbernorder+1,mask=False,saveplot=False,sigshape="dcbg")[4]
-        pvalueexpo = get_chisq(poly="expo",order=1,mask=False,saveplot=False,sigshape="dcbg")[4]
-        pvalueexpmulpoly = get_chisq(poly="expomulpoly",order=bestexpmulpolyorder,mask=False,saveplot=False,sigshape="dcbg")[4]
-        pvalueexppowpoly = get_chisq(poly="expopowpoly",order=bestexppowpolyorder,mask=False,saveplot=False,sigshape="dcbg")[4]
+        pvaluebern = residualsbern[4]
+        pvaluebernup = residualsbernup[4]
+        pvalueexpo = residualsexpo[4]
+        pvalueexpmulpoly = residualsexpmulpoly[4]
+        pvalueexppowpoly = residualsexppowpoly[4]
+
 
         print bestbernorder, bestexpmulpolyorder, bestexppowpolyorder
 
         print "The gof pvalue of best bern, berndown, bernup", pvaluebern, pvalueberndown, pvaluebernup
-        print "The gof pvalue of best bern, expo*poly, expo^poly", pvaluebern, pvalueexpmulpoly, pvalueexppowpoly
+        print "The gof pvalue of expo, expo*poly, expo^poly", pvalueexpo, pvalueexpmulpoly, pvalueexppowpoly
 
+        if bestbernorder != 0:
+            fitstatusberndown = residualsberndown[7]
+        else:
+            fitstatusberndown = -1
+
+        fitstatusbern = residualsbern[7]
+        fitstatusbernup = residualsbernup[7]
+        fitstatusexpo = residualsexpo[7]
+        fitstatusexpmulpoly = residualsexpmulpoly[7]
+        fitstatusexppowpoly = residualsexppowpoly[7]
 
         if bestbernorder != 0:
 
             makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=bestbernorder-1,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="bern")
 
         else:
-            
+
              makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=bestbernorder,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="bern")
-            
+
+
+        print bestbernorder, bestexpmulpolyorder, bestexppowpolyorder
+
+        print "The fit status of best bern, berndown, bernup", fitstatusbern, fitstatusberndown, fitstatusbernup
+        print "The fit status of expo, expo*poly, expo^poly", fitstatusexpo, fitstatusexpmulpoly, fitstatusexppowpoly
+
 
 os.chdir("./..")
