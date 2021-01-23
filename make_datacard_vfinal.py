@@ -75,10 +75,6 @@ tree_mudata.Add("/cms/scoutingmuon/hardik/unblind/CMSSW_10_2_13/src/HiggsAnalysi
 # tree_mudata.Print()
 
 lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
-# lxybins = np.array([[0.0,0.2]])
-# lxybins = np.array([[1.0,2.4],[3.1,7.0],[7.0,11.0]])
-#print lxybins[0,0], lxybins[0,1]
-
 ptbins = np.array([[0,25],[25,5000]])
 isobins = np.array([[1,0,0],[0,1,0],[0,0,1]])
 
@@ -114,7 +110,8 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
         l = ROOT.RooArgList(x)
 
         data_obs = ROOT.RooDataHist("data_obs", "data_obs", l, data)
-        
+
+
         if ptbins[j1,1] == 5000:
             ptstring = "Inf"
         elif ptbins[j1,1] == 25:
@@ -129,6 +126,8 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"
         if isobins[j2,0] == 0 and isobins[j2,1] == 0 and isobins[j2,2] == 1:
             isostring = "0isomu"
             isostring1 = "0 iso mu"
+
+
         
         ROOT.gErrorIgnoreLevel = ROOT.kWarning
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.ERROR)
@@ -1691,9 +1690,6 @@ def prob(polytype="bernstein",o=0):
 #################################################Main###########################################################
 
 
-h2 = []
-h1 = []
-
 for j in range(len(lxybins)):
 
     for j1 in range(len(ptbins)):
@@ -1719,53 +1715,53 @@ for j in range(len(lxybins)):
         
             ns = 100
 
-            h2.append(ROOT.TH1F("h2[{}]".format(j),"h2[{}]".format(j), int(bins), float(xfitdown), float(xfitup)))
+            h2 = ROOT.TH1F("h2","h2", int(bins), float(xfitdown), float(xfitup))
 
-            tree_mudata.Draw('mass>>h2[{}]'.format(j),"lxy > {} && lxy < {} && dimuon_pt > {} && dimuon_pt < {} && pass_all_iso_both == {} && pass_all_iso_one == {} && pass_all_iso_none == {} && mass > {} && mass < {}".format(lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptbins[j1,1], isobins[j2,0], isobins[j2,1], isobins[j2,2], xfitdown, xfitup),'')
+            tree_mudata.Draw('mass>>h2',"lxy > {} && lxy < {} && dimuon_pt > {} && dimuon_pt < {} && pass_all_iso_both == {} && pass_all_iso_one == {} && pass_all_iso_none == {} && mass > {} && mass < {}".format(lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptbins[j1,1], isobins[j2,0], isobins[j2,1], isobins[j2,2], xfitdown, xfitup),'')
 
             print float(xfitdown), float(xfitup)
 
             x_unmasked = []
             y_unmasked = []
-            print h2[j].GetNbinsX()
-            for i in range(h2[j].GetNbinsX()):
-                if(h2[j].GetBinCenter(i+1)>float(xfitdown)): 
-                    #print h2[j].GetBinCenter(i+1)
-                    x_unmasked.append(round(h2[j].GetBinCenter(i+1),ndecimal))
-                    y_unmasked.append(h2[j].GetBinContent(i+1))
+            print h2.GetNbinsX()
+            for i in range(h2.GetNbinsX()):
+                if(h2.GetBinCenter(i+1)>float(xfitdown)): 
+                    #print h2.GetBinCenter(i+1)
+                    x_unmasked.append(round(h2.GetBinCenter(i+1),ndecimal))
+                    y_unmasked.append(h2.GetBinContent(i+1))
 
             # print "x_unmasked", x_unmasked
             # print "y_unmasked", y_unmasked
             # print "y_unmasked_error", np.sqrt(y_unmasked)
 
             data = ROOT.TH1F("data","Histogram of data_obs__x", int(bins), float(xfitdown), float(xfitup))
-            for i in range(h2[j].GetNbinsX()):
+            for i in range(h2.GetNbinsX()):
                 # print i, x_unmasked[i],y_unmasked[i]
                 data.SetBinContent(i+1,y_unmasked[i])
 
-            h1.append(ROOT.TH1F("h1[{}]".format(j),"h1[{}]".format(j), int(bins), float(xfitdown), float(xfitup)))
+            h1 = ROOT.TH1F("h1","h1", int(bins), float(xfitdown), float(xfitup))
 
-            tree_mudata.Draw('mass>>h1[{}]'.format(j),"lxy > {} && lxy < {} && dimuon_pt > {} && dimuon_pt < {} && pass_all_iso_both == {} && pass_all_iso_one == {} && pass_all_iso_none == {} && mass > {} && mass < {} && (mass < {} || mass > {})".format(lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptbins[j1,1], isobins[j2,0], isobins[j2,1], isobins[j2,2], xfitdown, xfitup, xsigdown, xsigup),'')
+            tree_mudata.Draw('mass>>h1',"lxy > {} && lxy < {} && dimuon_pt > {} && dimuon_pt < {} && pass_all_iso_both == {} && pass_all_iso_one == {} && pass_all_iso_none == {} && mass > {} && mass < {} && (mass < {} || mass > {})".format(lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptbins[j1,1], isobins[j2,0], isobins[j2,1], isobins[j2,2], xfitdown, xfitup, xsigdown, xsigup),'')
 
             x_masked = []
             y_masked = []
-            print h1[j].GetNbinsX()
-            for i in range(h1[j].GetNbinsX()):
-                # if(h1[j].GetBinCenter(i+1)>float(xfitdown) and h1[j].GetBinContent(i+1)>0):
-                #         x_masked.append(round(h1[j].GetBinCenter(i+1),3))
-                #         y_masked.append(h1[j].GetBinContent(i+1))
+            print h1.GetNbinsX()
+            for i in range(h1.GetNbinsX()):
+                # if(h1.GetBinCenter(i+1)>float(xfitdown) and h1.GetBinContent(i+1)>0):
+                #         x_masked.append(round(h1.GetBinCenter(i+1),3))
+                #         y_masked.append(h1.GetBinContent(i+1))
 
-                if(h1[j].GetBinCenter(i+1)>float(xfitdown) and h1[j].GetBinCenter(i+1)<float(xsigdown)):
-                    x_masked.append(round(h1[j].GetBinCenter(i+1),ndecimal))
-                    y_masked.append(h1[j].GetBinContent(i+1))
+                if(h1.GetBinCenter(i+1)>float(xfitdown) and h1.GetBinCenter(i+1)<float(xsigdown)):
+                    x_masked.append(round(h1.GetBinCenter(i+1),ndecimal))
+                    y_masked.append(h1.GetBinContent(i+1))
 
-                # if(h1[j].GetBinCenter(i+1)>=float(xsigdown) and h1[j].GetBinCenter(i+1)<=float(xsigup) and h1[j].GetBinContent(i+1)>0):
-                #         x_masked.append(round(h1[j].GetBinCenter(i+1),3))
-                #         y_masked.append(h1[j].GetBinContent(i+1))
+                # if(h1.GetBinCenter(i+1)>=float(xsigdown) and h1.GetBinCenter(i+1)<=float(xsigup) and h1.GetBinContent(i+1)>0):
+                #         x_masked.append(round(h1.GetBinCenter(i+1),3))
+                #         y_masked.append(h1.GetBinContent(i+1))
  
-                if(h1[j].GetBinCenter(i+1)>float(xsigup) and h1[j].GetBinCenter(i+1)<float(xfitup)):
-                    x_masked.append(round(h1[j].GetBinCenter(i+1),ndecimal))
-                    y_masked.append(h1[j].GetBinContent(i+1))
+                if(h1.GetBinCenter(i+1)>float(xsigup) and h1.GetBinCenter(i+1)<float(xfitup)):
+                    x_masked.append(round(h1.GetBinCenter(i+1),ndecimal))
+                    y_masked.append(h1.GetBinContent(i+1))
 
             # print "x_masked", x_masked
             # print "y_masked", y_masked
@@ -1773,10 +1769,10 @@ for j in range(len(lxybins)):
 
             x_sigdata = [] 
             y_sigdata = []
-            for i in range(h2[j].GetNbinsX()):
-                if(h2[j].GetBinCenter(i+1)>float(xsigdown) and h2[j].GetBinCenter(i+1)<float(xsigup)):
-                    x_sigdata.append(round(h2[j].GetBinCenter(i+1),ndecimal))
-                    y_sigdata.append(h2[j].GetBinContent(i+1))
+            for i in range(h2.GetNbinsX()):
+                if(h2.GetBinCenter(i+1)>float(xsigdown) and h2.GetBinCenter(i+1)<float(xsigup)):
+                    x_sigdata.append(round(h2.GetBinCenter(i+1),ndecimal))
+                    y_sigdata.append(h2.GetBinContent(i+1))
 
 
             numbins = len(x_unmasked) 
@@ -1868,5 +1864,9 @@ for j in range(len(lxybins)):
 
                 makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=bestbernorder,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="bern")
 
+
+            h1.Reset()
+            h2.Reset()
+            data.Reset()
 
 os.chdir("./..")
