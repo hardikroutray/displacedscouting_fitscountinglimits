@@ -144,7 +144,7 @@ def get_mcstatunc(mass = 2, ctau = 1, sample="hzd", whichbin="lxybin1_ptbin1_iso
 
     sys_mcstatunc = Rbf(x_data, y_data, z_data, epsilon=0.03)
 
-    return 1/np.sqrt(sys_mcstatunc(mass,ctau))
+    return 1/np.sqrt(np.clip(sys_mcstatunc(mass,ctau),1,None))
 
 # mcstat_unc_val = get_mcstatunc(mass = 2, ctau = 1, sample="hzd", whichbin=getbin(inputcard=card))
 # print "mcstatunc", float(mcstat_unc_val)
@@ -187,6 +187,8 @@ for j in range(len(masses)):
         print "looking at mass ", masses[j], "and ctau ", ctaus[k]
 
         print "The acceptance of this mass,ctau point is ", acceptance(masses[j],ctaus[k],sample="hzd",whichbin="allbins")
+        acc_allbins = acceptance(masses[j],ctaus[k],sample="hzd",whichbin="allbins")
+
         
         lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
         ptbins = np.array([[0,25],[25,5000]])
@@ -281,17 +283,14 @@ for j in range(len(masses)):
                 coms_exp = float(line[13:])   
 
 
-        # exp_xsec = coms_exp
-        # exp_xsec = coml_exp*totalsignalrate
-        # exp_xsec = (coml_exp*totalsignalrate)/(10.1*acc_lxyall)
 
-        exp_xsec = (coml_exp*totalsignalrate)/(10.1*2*acc_lxyall)
+        exp_xsec = (coml_exp*totalsignalrate)/(10.1*2*acc_allbins)
         nevt = coml_exp*totalsignalrate
         nevtup = coml_1su*totalsignalrate
         nevtdown = coml_1sd*totalsignalrate
-        brfrac = (coml_exp*totalsignalrate)/(10.1*2*acc_lxyall*48610.7)
-        brfracup = (coml_1su*totalsignalrate)/(10.1*2*acc_lxyall*48610.7)
-        brfracdown = (coml_1sd*totalsignalrate)/(10.1*2*acc_lxyall*48610.7)
+        brfrac = (coml_exp*totalsignalrate)/(10.1*2*acc_allbins*48610.7)
+        brfracup = (coml_1su*totalsignalrate)/(10.1*2*acc_allbins*48610.7)
+        brfracdown = (coml_1sd*totalsignalrate)/(10.1*2*acc_allbins*48610.7)
 
 
         print "The expected 50% UL xsec is ", exp_xsec
