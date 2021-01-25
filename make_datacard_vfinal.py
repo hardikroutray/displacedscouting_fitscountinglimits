@@ -19,6 +19,7 @@ sys.argv = oldargv
 import numpy as np
 from array import array
 import pandas as pd
+import scipy.stats
 
 # from ROOT import TH1F, TH1D, TH2D, TFile, TLorentzVector, TVector3, TChain, TProfile, TTree, TGraph
 from ROOT import *
@@ -76,8 +77,10 @@ tree_mudata.Add("/cms/scoutingmuon/hardik/unblind/CMSSW_10_2_13/src/HiggsAnalysi
 
 lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])
 ptbins = np.array([[0,25],[25,5000]])
-isobins = np.array([[1,0,0],[0,1,0],[0,0,1]])
-
+if mass <= 5:
+    isobins = np.array([[1,0,0],[0,1,0],[0,0,1]])
+else:
+    isobins =  np.array([[1,0,0]])
 
 mu = mass
 sig = 0.011*mass
@@ -1106,7 +1109,7 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         xframe1 = x.frame(ROOT.RooFit.Title("mass {}GeV, lxy {}cm - {}cm, pt {}-{}, {}".format(mass,lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring1)))
         data_obs.plotOn(xframe1, ROOT.RooFit.Name("data"))
         
-        if data.Integral() != 0:
+        if data.Integral() != 0 and data.Integral() <= 500:
 
             if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 backgroundbernup.plotOn(xframe1,ROOT.RooFit.LineColor(4),ROOT.RooFit.Name("bkg_bern_up"), ROOT.RooFit.LineStyle(2))
@@ -1117,6 +1120,19 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
             if pvalueexpmulpoly > 0.01 and fitstatusexpmulpoly == 0:
                 backgroundexpmulpoly.plotOn(xframe1,ROOT.RooFit.LineColor(46),ROOT.RooFit.Name("bkg_expmulpoly"), ROOT.RooFit.LineStyle(2))
             if pvalueexppowpoly > 0.01 and fitstatusexppowpoly == 0:
+                backgroundexppowpoly.plotOn(xframe1,ROOT.RooFit.LineColor(30),ROOT.RooFit.Name("bkg_exppowpoly"), ROOT.RooFit.LineStyle(2))
+
+        elif data.Integral() > 500:
+
+            if pvaluebernup > 0.01 and pvaluebernup_new > 0.01 and fitstatusbernup == 0:
+                backgroundbernup.plotOn(xframe1,ROOT.RooFit.LineColor(4),ROOT.RooFit.Name("bkg_bern_up"), ROOT.RooFit.LineStyle(2))
+            if pvalueberndown > 0.01 and pvalueberndown_new > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
+                backgroundberndown.plotOn(xframe1,ROOT.RooFit.LineColor(7),ROOT.RooFit.Name("bkg_bern_down"), ROOT.RooFit.LineStyle(2))
+            if pvalueexpo > 0.01 and pvalueexpo_new > 0.01 and fitstatusexpo == 0:
+                backgroundexpo.plotOn(xframe1,ROOT.RooFit.LineColor(28),ROOT.RooFit.Name("bkg_expo"), ROOT.RooFit.LineStyle(2))
+            if pvalueexpmulpoly > 0.01 and pvalueexpmulpoly_new > 0.01 and fitstatusexpmulpoly == 0:
+                backgroundexpmulpoly.plotOn(xframe1,ROOT.RooFit.LineColor(46),ROOT.RooFit.Name("bkg_expmulpoly"), ROOT.RooFit.LineStyle(2))
+            if pvalueexppowpoly > 0.01 and pvalueexppowpoly_new > 0.01 and fitstatusexppowpoly == 0:
                 backgroundexppowpoly.plotOn(xframe1,ROOT.RooFit.LineColor(30),ROOT.RooFit.Name("bkg_exppowpoly"), ROOT.RooFit.LineStyle(2))
 
         else:
@@ -1149,16 +1165,21 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         leg1.SetFillStyle(0)
         leg1.AddEntry(xframe0.findObject("data"), "Data [{} < lxy < {}, {} < pt < {}, {}]".format(lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring1), "pe")
 
-        if data.Integral() != 0:
+        if data.Integral() != 0 and data.Integral() <= 500:
             if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_down"), "#color[1]{%s Fit}" %("bernstein" + "(" + str(orderberndown) + ")"), "l")
+
+        elif data.Integral() > 500:
+            if pvalueberndown > 0.01 and pvalueberndown_new > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
+                leg1.AddEntry(xframe1.findObject("bkg_bern_down"), "#color[1]{%s Fit}" %("bernstein" + "(" + str(orderberndown) + ")"), "l")            
+
         else:
             if pvalueberndown > 0.01 and pvalueberndown!= 1 and orderberndown != orderbern and fitstatusberndown == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_down"), "#color[1]{%s Fit}" %("bernstein" + "(" + str(orderberndown) + ")"), "l")
  
         leg1.AddEntry(xframe1.findObject("bkg_bern"), "#color[2]{%s Fit}" %("bernstein"  + "(" + str(orderbern) + ")" + "(best order)"), "l")
 
-        if data.Integral() != 0:
+        if data.Integral() != 0 and data.Integral() <= 500:
             if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_up"), "#color[1]{%s Fit}" %("bernstein"  + "(" + str(orderbernup) + ")"), "l")
             if pvalueexpo > 0.01 and fitstatusexpo == 0:
@@ -1167,6 +1188,17 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
                 leg1.AddEntry(xframe1.findObject("bkg_expmulpoly"), "#color[1]{%s Fit}" %("expo*pol" + "(" + str(orderexpmulpoly) + ")"), "l")
             if pvalueexppowpoly > 0.01 and fitstatusexppowpoly == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_exppowpoly"), "#color[1]{%s Fit}" %("expo^pol" + "(" + str(orderexppowpoly) + ")"), "l")
+
+        elif data.Integral() > 500:
+            if pvaluebernup > 0.01 and pvaluebernup_new > 0.01 and fitstatusbernup == 0:
+                leg1.AddEntry(xframe1.findObject("bkg_bern_up"), "#color[1]{%s Fit}" %("bernstein"  + "(" + str(orderbernup) + ")"), "l")
+            if pvalueexpo > 0.01 and pvalueexpo_new > 0.01 and fitstatusexpo == 0:
+                leg1.AddEntry(xframe1.findObject("bkg_expo"), "#color[1]{%s Fit}" %("exponential"), "l") 
+            if pvalueexpmulpoly > 0.01 and pvalueexpmulpoly_new > 0.01 and fitstatusexpmulpoly == 0:
+                leg1.AddEntry(xframe1.findObject("bkg_expmulpoly"), "#color[1]{%s Fit}" %("expo*pol" + "(" + str(orderexpmulpoly) + ")"), "l")
+            if pvalueexppowpoly > 0.01 and pvalueexppowpoly_new > 0.01 and fitstatusexppowpoly == 0:
+                leg1.AddEntry(xframe1.findObject("bkg_exppowpoly"), "#color[1]{%s Fit}" %("expo^pol" + "(" + str(orderexppowpoly) + ")"), "l")
+
         else:
             if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 leg1.AddEntry(xframe1.findObject("bkg_bern_up"), "#color[1]{%s Fit}" %("bernstein"  + "(" + str(orderbernup) + ")"), "l")
@@ -1350,12 +1382,12 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
 
         poly = "bernstein"
         order = orderbern
-        cat = ROOT.RooCategory("pdf_index{}".format(j+1),"Index of Pdf which is active")
+        cat = ROOT.RooCategory("pdf_index{}{}{}".format(j+1,j1+1,j2+1),"Index of Pdf which is active")
         mypdfs = ROOT.RooArgList()
 
         mypdfs.add(backgroundbern)
 
-        if data.Integral() != 0:
+        if data.Integral() != 0 and data.Integral() <= 500:
 
             if pvaluebernup > 0.01 and fitstatusbernup == 0: 
                 mypdfs.add(backgroundbernup)
@@ -1368,6 +1400,18 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
             if pvalueexppowpoly > 0.01 and fitstatusexppowpoly == 0:
                 mypdfs.add(backgroundexppowpoly)
 
+        elif data.Integral() > 500:
+            if pvaluebernup > 0.01 and pvaluebernup_new > 0.01 and fitstatusbernup == 0: 
+                mypdfs.add(backgroundbernup)
+            if pvalueberndown > 0.01 and pvalueberndown_new > 0.01 and pvalueberndown != 1 and orderberndown != orderbern and fitstatusberndown == 0:
+                mypdfs.add(backgroundberndown)
+            if pvalueexpo > 0.01 and pvalueexpo_new > 0.01 and fitstatusexpo == 0:
+                mypdfs.add(backgroundexpo)
+            if pvalueexpmulpoly > 0.01 and pvalueexpmulpoly_new > 0.01 and fitstatusexpmulpoly == 0:
+                mypdfs.add(backgroundexpmulpoly)
+            if pvalueexppowpoly > 0.01 and pvalueexppowpoly_new > 0.01 and fitstatusexppowpoly == 0:
+                mypdfs.add(backgroundexppowpoly)
+            
         else:
             if pvaluebernup > 0.01 and fitstatusbernup == 0:
                 mypdfs.add(backgroundbernup)
@@ -1415,8 +1459,8 @@ def makedatacard(orderbern=4,orderbernup=5,orderberndown=3,ordercheb=1,orderexpm
         datacard.write("oneminuseff lnN {} -\n".format(1))
         datacard.write("mcstat_unc{}{}{} lnN {} -\n".format(j+1,j1+1,j2+1,1))
         datacard.write("sigma param {} {}\n".format(sig,sig/2))
-        datacard.write("mean param {} {}\n".format(mu,sig/2))
-        datacard.write("mean1 param {} {}\n".format(mu,sig/2))
+        datacard.write("mean param {} {}\n".format(mu,sig))
+        datacard.write("mean1 param {} {}\n".format(mu,sig))
         datacard.write("pdf_index{}{}{} discrete\n".format(j+1,j1+1,j2+1))
         
         datacard.close()
@@ -1787,7 +1831,6 @@ for j in range(len(lxybins)):
             print "number of sideband events", numsideband
             print "number of bins", numbins
 
-
             bestbernorder = ftest(polytype="bernstein")
             bestexpmulpolyorder = ftest(polytype="expomulpoly")
             bestexppowpolyorder = ftest(polytype="expopowpoly")
@@ -1813,11 +1856,38 @@ for j in range(len(lxybins)):
             pvalueexpmulpoly = residualsexpmulpoly[4]
             pvalueexppowpoly = residualsexppowpoly[4]
 
-
             print bestbernorder, bestexpmulpolyorder, bestexppowpolyorder
 
             print "The gof pvalue of best bern, berndown, bernup", pvaluebern, pvalueberndown, pvaluebernup
             print "The gof pvalue of expo, expo*poly, expo^poly", pvalueexpo, pvalueexpmulpoly, pvalueexppowpoly
+
+
+            if bestbernorder != 0:
+                chi2berndown = residualsberndown[6]
+            else:
+                chi2berndown = 0
+            chi2bern = residualsbern[6]
+            chi2bernup = residualsbernup[6]
+            chi2expo = residualsexpo[6]
+            chi2expmulpoly = residualsexpmulpoly[6]
+            chi2exppowpoly = residualsexppowpoly[6]
+
+            if bestbernorder != 0:
+                pvalueberndown_new = 1 - scipy.stats.chi2.cdf(chi2berndown, numbins - (bestbernorder-1))
+            else:
+                pvalueberndown_new = 0
+
+            pvaluebern_new = 1 - scipy.stats.chi2.cdf(chi2bern, numbins - bestbernorder)
+            pvaluebernup_new = 1 - scipy.stats.chi2.cdf(chi2bernup, numbins - (bestbernorder+1))
+            pvalueexpo_new = 1 - scipy.stats.chi2.cdf(chi2expo, numbins - 1)
+            pvalueexpmulpoly_new = 1 - scipy.stats.chi2.cdf(chi2expmulpoly, numbins - (bestexpmulpolyorder+1))
+            pvalueexppowpoly_new = 1 - scipy.stats.chi2.cdf(chi2exppowpoly, numbins - (bestexppowpolyorder+1))
+            
+            print bestbernorder, bestexpmulpolyorder, bestexppowpolyorder
+
+            print "The chi2 pvalue of best bern, berndown, bernup", pvaluebern_new, pvalueberndown_new, pvaluebernup_new
+            print "The chi2 pvalue of expo, expo*poly, expo^poly", pvalueexpo_new, pvalueexpmulpoly_new, pvalueexppowpoly_new
+
 
             if bestbernorder != 0:
                 fitstatusberndown = residualsberndown[7]
@@ -1864,9 +1934,10 @@ for j in range(len(lxybins)):
 
                 makedatacard(orderbern=bestbernorder,orderbernup=bestbernorder+1,orderberndown=bestbernorder,orderexpmulpoly=bestexpmulpolyorder,orderexppowpoly=bestexppowpolyorder,sigshape="dcbg",dobiastest=False,testpoly="bern",toypoly="bern")
 
-
             h1.Reset()
             h2.Reset()
             data.Reset()
+
+
 
 os.chdir("./..")
