@@ -283,22 +283,20 @@ for j in range(len(masses)):
                 coms_exp = float(line[13:])   
 
 
-
-        exp_xsec = (coml_exp*totalsignalrate)/(10.1*2*acc_allbins)
+        exp_xsec = (coml_exp*totalsignalrate)/(101.3*2*acc_allbins)
         nevt = coml_exp*totalsignalrate
         nevtup = coml_1su*totalsignalrate
         nevtdown = coml_1sd*totalsignalrate
-        brfrac = (coml_exp*totalsignalrate)/(10.1*2*acc_allbins*48610.7)
-        brfracup = (coml_1su*totalsignalrate)/(10.1*2*acc_allbins*48610.7)
-        brfracdown = (coml_1sd*totalsignalrate)/(10.1*2*acc_allbins*48610.7)
-
-
+        brfrac = (coml_exp*totalsignalrate)/(101.3*2*acc_allbins*48610.7)
+        brfracup = (coml_1su*totalsignalrate)/(101.3*2*acc_allbins*48610.7)
+        brfracdown = (coml_1sd*totalsignalrate)/(101.3*2*acc_allbins*48610.7)
+        
         print "The expected 50% UL xsec is ", exp_xsec
 
         x.append(masses[j])
         y.append(ctaus[k])
         zexp50.append(exp_xsec)
-        acc.append(acc_lxyall)
+        acc.append(acc_allbins)
 
         dct['mass{}_exp50'.format(masses[j])].append(exp_xsec)
         dct['ctau{}_exp50'.format(ctaus[k])].append(exp_xsec)
