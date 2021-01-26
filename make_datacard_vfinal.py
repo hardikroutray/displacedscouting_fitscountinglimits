@@ -57,7 +57,7 @@ for i in range(len(masseslist)):
     masses.append(masseslist[i])
 
 
-print masses
+# print masses
 print len(masses)
 
 mass = masses[int(sys.argv[1])]
@@ -100,7 +100,7 @@ bins = int(round((xfitup-xfitdown)/binwidth))
 print xsigup, xsigdown, xfitup, xfitdown, bins
 print float(xsigup), float(xsigdown), float(xfitup), float(xfitdown), int(bins) 
 
-def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,savefitplot=False,sigshape="dcbg"):
+def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,sigshape="dcbg"):
 
 	x = ROOT.RooRealVar("x","x",float(xfitdown),float(xfitup))
 
@@ -455,7 +455,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,savefitplot=Fal
 			KS_Vs.append(KS_Ts.limit)
 
 
-        goftoys = 100
+        goftoys = 25
         os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order,goftoys))
         KS_F = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".123456.root")
         KS_T = KS_F.Get("limit")
@@ -481,7 +481,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,savefitplot=Fal
         integral = KS_plot.Integral(1, KS_plot.FindBin(KS_Vs[0]))
 
 
-        if savefitplot or saveplot:
+        if saveplot:
 		c2 = ROOT.TCanvas("c2","c2")
 		pad1 = ROOT.TPad("pad1", "The pad 80% of the height", 0.0, 0.2, 1.0, 1.0, 0)
 		pad2 = ROOT.TPad("pad2", "The pad 20% of the height", 0.0, 0.0, 1.0, 0.2, 0)
@@ -569,7 +569,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,savefitplot=Fal
 
 
 
-        if savefitplot or saveplot:
+        if saveplot:
                 GoodPlotFormat(KS_plot, "markers", ROOT.kBlack, 20)
                 KS_mk = ROOT.TLine(KS_Vs[0], 0., KS_Vs[0], KS_plot.GetMaximum())
                 KS_mk.SetLineColor(ROOT.kRed)
@@ -675,7 +675,7 @@ def get_chisq(poly="bernstein",order=4,mask=False,saveplot=False,savefitplot=Fal
 		os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.root'.format(mass))
                 os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.123456.root'.format(mass))
 
-        if saveplot == 1 or savefitplot == 1:
+        if saveplot == 1:
                 os.system('rm higgsCombineTest.AsymptoticLimits.mH{}.root'.format(mass))
                 os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.root'.format(mass))
                 os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.123456.root'.format(mass))
@@ -1743,8 +1743,8 @@ for j in range(len(lxybins)):
             print "Looking at lxy bin----------",lxybins[j,0], "-", lxybins[j,1], "----------pT bin---------", ptbins[j1,0],"-",ptbins[j1,1], "-----------isolation bin---------", isobins[j2,0],isobins[j2,1],isobins[j2,2],"-------------------"
    
             mu = mass
-            sig = 0.01*mass
-            gam = 0.01*mass
+            sig = 0.011*mass
+            gam = 0.011*mass
 
             binwidth = sig/10
             ndecimal = num_after_point(binwidth) + 1
@@ -1836,13 +1836,13 @@ for j in range(len(lxybins)):
             bestexppowpolyorder = ftest(polytype="expopowpoly")
  
             if bestbernorder != 0:
-                residualsberndown = get_chisq(poly="bernstein",order=bestbernorder-1,mask=False,saveplot=False,savefitplot=True,sigshape="dcbg")
+                residualsberndown = get_chisq(poly="bernstein",order=bestbernorder-1,mask=False,saveplot=False,sigshape="dcbg")
 
-            residualsbern = get_chisq(poly="bernstein",order=bestbernorder,mask=False,saveplot=False,savefitplot=True,sigshape="dcbg")
-            residualsbernup = get_chisq(poly="bernstein",order=bestbernorder+1,mask=False,saveplot=False,savefitplot=True,sigshape="dcbg")
-            residualsexpo = get_chisq(poly="expo",order=1,mask=False,saveplot=False,savefitplot=True,sigshape="dcbg")
-            residualsexpmulpoly = get_chisq(poly="expomulpoly",order=bestexpmulpolyorder,mask=False,saveplot=False,savefitplot=True,sigshape="dcbg")
-            residualsexppowpoly = get_chisq(poly="expopowpoly",order=bestexppowpolyorder,mask=False,saveplot=False,savefitplot=True,sigshape="dcbg")
+            residualsbern = get_chisq(poly="bernstein",order=bestbernorder,mask=False,saveplot=False,sigshape="dcbg")
+            residualsbernup = get_chisq(poly="bernstein",order=bestbernorder+1,mask=False,saveplot=False,sigshape="dcbg")
+            residualsexpo = get_chisq(poly="expo",order=1,mask=False,saveplot=False,sigshape="dcbg")
+            residualsexpmulpoly = get_chisq(poly="expomulpoly",order=bestexpmulpolyorder,mask=False,saveplot=False,sigshape="dcbg")
+            residualsexppowpoly = get_chisq(poly="expopowpoly",order=bestexppowpolyorder,mask=False,saveplot=False,sigshape="dcbg")
 
 
             if bestbernorder != 0:
