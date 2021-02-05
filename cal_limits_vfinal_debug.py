@@ -242,6 +242,8 @@ for j in range(len(masses)):
         print "The sum of scaled signal rates", sum(signal_rates.values())
         
         singlebinlimitsall = []
+        divergentlimitsall = []
+
         for file in glob.glob("simple*.txt"):
             # print(file)
             bin_val = getbin(inputcard=file)
@@ -252,6 +254,7 @@ for j in range(len(masses)):
 
             suffix = (file.split("mass{}_".format(masses[j]))[1]).split("_bernstein")[0]
 
+            '''
             os.system('combine -M  AsymptoticLimits -m {} --rAbsAcc=0.0001 --rRelAcc=0.001 datacard_mass{}_ctau{}_{}.txt > com.out'.format(masses[j],masses[j],ctaus[k],suffix))
 
             com_out = open('com.out','r')                                                                                                                                               
@@ -279,9 +282,43 @@ for j in range(len(masses)):
                     singlebinlimits["r_upup"] = float(line[19:])
                     
             singlebinlimitsall.append(singlebinlimits)
-     
-        dfsinglebin = pd.DataFrame(singlebinlimitsall)
-        dfsinglebin.to_csv('singlebinlimits_mass{}_ctau{}.csv'.format(masses[j],ctaus[k]),index=False)
+            '''
+
+            os.system('combineCards.py -S datacard_mass{}_ctau{}_Lxy*.txt > datacard_mass{}_ctau{}_allbins.txt'.format(masses[j],ctaus[k],masses[j],ctaus[k]))
+            os.system('combine -M  AsymptoticLimits -m {} --rAbsAcc=0.0001 --rRelAcc=0.001 datacard_mass{}_ctau{}_allbins.txt > com.out'.format(masses[j],masses[j],ctaus[k]))
+
+            com_out = open('com.out','r')                                                                                                                                               
+            divergentlimits = {}
+
+            divergentlimits["bin_val"] = suffix
+
+            for line in com_out:                                                                                                                                                       
+                if line[:15] == 'Observed Limit:':                                                                                                                                  
+                    divergentlimits["r_obs"] = float(line[19:])                                                                                                                              
+
+                elif line[:15] == 'Expected  2.5%:':                                                                                                                                
+                    divergentlimits["r_downdown"] = float(line[19:])                                                                                                                                 
+                elif line[:15] == 'Expected 16.0%:':                                                                                                                                
+                    divergentlimits["r_down"] = float(line[19:])                                                                                                                                
+
+                elif line[:15] == 'Expected 50.0%:':                                                                                                                                
+                    divergentlimits["r_exp"] = float(line[19:])                                                                                                                                 
+
+                elif line[:15] == 'Expected 84.0%:':                                                                                                                                
+                    divergentlimits["r_up"] = float(line[19:])                                                                                                                                 
+
+                elif line[:15] == 'Expected 97.5%:':                                                                                                                                    
+                    divergentlimits["r_upup"] = float(line[19:])
+                    
+            divergentlimitsall.append(divergentlimits)
+
+
+        # dfsinglebin = pd.DataFrame(singlebinlimitsall)
+        # dfsinglebin.to_csv('singlebinlimits_mass{}_ctau{}.csv'.format(masses[j],ctaus[k]),index=False)
+
+        dfdivergent = pd.DataFrame(divergentlimitsall)
+        dfdivergent.to_csv('divergentlimits_mass{}_ctau{}.csv'.format(masses[j],ctaus[k]),index=False)
+
 
         # exit()
 
