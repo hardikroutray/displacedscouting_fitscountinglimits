@@ -26,6 +26,10 @@ graphHeight = 600 # units are pixels
 # 3D contour plot lines                                                                        
 numberOfContourLines = 16
 
+# import argparse
+# parser = argparse.ArgumentParser()
+# parser.add_argument("index_number", help="list index to run on",type=int)
+# args = parser.parse_args()
 
 hzdallcsv = pd.read_csv('totalacceptance_hzd.csv')
 hzdbincsv = pd.read_csv('binbybinacceptance_hzd.csv')
@@ -36,18 +40,17 @@ zexp50 = []
 accbr = []
 acc = []
 
-masseslist = [0.2, 0.202, 0.204, 0.206, 0.208, 0.21, 0.212, 0.214, 0.216, 0.218, 0.22, 0.222, 0.224, 0.226, 0.228, 0.23, 0.232, 0.234, 0.236, 0.238, 0.24, 0.242, 0.244, 0.246, 0.248, 0.25, 0.252, 0.254, 0.256, 0.258, 0.26, 0.262, 0.264, 0.266, 0.268, 0.27, 0.272, 0.274, 0.276, 0.278, 0.28, 0.282, 0.284, 0.286, 0.288, 0.29, 0.292, 0.294, 0.296, 0.298, 0.3, 0.302, 0.304, 0.306, 0.308, 0.31, 0.312, 0.314, 0.316, 0.318, 0.32, 0.322, 0.324, 0.326, 0.328, 0.33, 0.332, 0.334, 0.336, 0.338, 0.34, 0.342, 0.344, 0.346, 0.348, 0.35, 0.352, 0.354, 0.356, 0.358, 0.36, 0.362, 0.364, 0.366, 0.368, 0.37, 0.372, 0.374, 0.376, 0.378, 0.38, 0.382, 0.384, 0.386, 0.388, 0.39, 0.392, 0.394, 0.396, 0.398, 0.4, 0.402, 0.404, 0.406, 0.408, 0.41, 0.412, 0.414, 0.416, 0.418, 0.42, 0.422, 0.424, 0.426, 0.428, 0.43, 0.432, 0.434, 0.436, 0.438, 0.44, 0.442, 0.444, 0.446, 0.448, 0.45, 0.452, 0.454, 0.456, 0.458, 0.46, 0.462, 0.464, 0.466, 0.468, 0.47, 0.472, 0.474, 0.476, 0.478, 0.48, 0.482, 0.484, 0.486, 0.48, 0.49, 0.492, 0.494, 0.496, 0.498,0.5,0.505,0.51,0.515,0.52,0.525,0.53,0.535,0.54,0.545,0.55,0.56,0.565,0.57,0.575,0.58,0.585,0.59,0.595,0.6,0.605,0.61,0.615,0.62,0.625,0.63,0.635,0.64,0.645,0.65,0.655,0.66,0.665,0.67,0.675,0.68,0.685,0.69,0.695,0.7,0.705,0.71,0.715,0.72,0.725,0.73,0.735,0.74,0.745,0.75,0.755,0.76,0.765,0.77,0.775,0.78,0.785,0.79,0.795,0.8,0.805,0.81,0.815,0.82,0.825,0.83,0.835,0.84,0.845,0.85,0.855,0.86,0.865,0.87,0.875,0.88,0.885,0.89,0.895,0.9,0.905,0.91,0.915,0.92,0.925,0.93,0.935,0.94,0.945,0.95,0.955,0.96,0.965,0.97,0.975,0.98,0.985,0.99,0.995,1,1.01,1.02,1.03,1.04,1.05,1.06,1.07,1.08,1.09,1.1,1.11,1.12,1.13,1.14,1.15,1.16,1.17,1.18,1.19,1.2,1.21,1.22,1.23,1.24,1.25,1.26,1.27,1.28,1.29,1.3,1.31,1.32,1.33,1.34,1.35,1.36,1.37,1.38,1.39,1.4,1.41,1.42,1.43,1.44,1.45,1.46,1.47,1.48,1.49,1.5,1.51,1.52,1.53,1.54,1.55,1.56,1.57,1.58,1.59,1.6,1.61,1.62,1.63,1.64,1.65,1.66,1.67,1.68,1.69,1.7,1.71,1.72,1.73,1.74,1.75,1.76,1.77,1.78,1.79,1.8,1.81,1.82,1.83,1.84,1.85,1.86,1.87,1.88,1.89,1.9,1.91,1.92,1.93,1.94,1.95,1.96,1.97,1.98,1.99,2,2.02,2.04,2.06,2.08,2.1,2,12,2.14,2.16,2.18,2.20,2.22,2.24,2.26,2.28,2.3,2.32,2.34,2.36,2.38,2.40,2.42,2.44,2.46,2.48,2.5,2.52,2.54,2.56,2.58,2.6,2.62,2.64,2.66,2.68,2.70,2.72,2.74,2.76,2.78,2.8,2.82,2.84,2.86,2.88,2.9,2.92,2.94,2.96,2.98,3, 3.03, 3.06, 3.09, 3.12, 3.15, 3.18, 3.21, 3.24, 3.27, 3.3, 3.33, 3.36, 3.39, 3.42, 3.45, 3.48, 3.51, 3.54, 3.57, 3.6, 3.63, 3.66, 3.69, 3.71, 3.75, 3.78, 3.81, 3.84, 3.87, 3.9, 3.92, 3.96, 3.99, 4, 4.04, 4.08, 4.12, 4.16, 4.2, 4.24, 4.28, 4.32, 4.36, 4.4, 4.44, 4.48, 4.52, 4.56, 4.6, 4.64, 4.68, 4.72, 4.76, 4.8, 4.84, 4.88, 4.92, 4.96, 5, 5.05, 5.1, 5.15, 5.2, 5.25, 5.3, 5.35, 5.4, 5.45, 5.5, 5.55, 5.6, 5.65, 5.7, 5.75, 5.8, 5.85, 5.9, 5.95, 6, 6.06, 6.12, 6.18, 6.24, 6.3, 6.36, 6.42, 6.48, 6.54, 6.6, 6.66, 6.72, 6.78, 6.84, 6.9, 6.96, 7, 7.07, 7.14, 7.21, 7.28, 7.35, 7.42, 7.49, 7.56, 7.63, 7.7, 7.77, 7.84, 7.91, 7.98, 8, 8.08, 8.16, 8.24, 8.32, 8.4, 8.48, 8.56, 8.64, 8.72, 8.8, 8.88, 8.96, 9, 9.09, 9.18, 9.27, 9.36, 9.45, 9.54, 9.63, 9.72, 9.81, 9.9, 9.99, 10, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 13, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8, 14.9, 15,  15.1, 15.2, 15.3, 15.4, 15.5, 15.6, 15.7, 15.8, 15.9, 16, 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, 16.7, 16.8, 16.9, 17, 17.1, 17.2, 17.3, 17.4, 17.5, 17.6, 17.7, 17.8, 17.9, 18, 18.1, 18.2, 18.3, 18.4, 18.5, 18.6, 18.7, 18.8, 18.9, 19, 19.1, 19.2, 19.3, 19.4, 19.5, 19.6, 19.7, 19.8, 19.9, 20]
- # [20.2, 20.4, 20.6, 20.8, 21, 21.2, 21.4, 21.6, 21.8, 22, 22.2, 22.4, 22.6, 22.8, 23, 23.2, 23.4, 23.6, 23.8, 24, 24.2, 24.4, 24.6, 24.8, 25]
+masseslist = [0.2, 0.202, 0.204, 0.206, 0.208, 0.21, 0.212, 0.214, 0.216, 0.218, 0.22, 0.222, 0.224, 0.226, 0.228, 0.23, 0.232, 0.234, 0.236, 0.238, 0.24, 0.242, 0.244, 0.246, 0.248, 0.25, 0.252, 0.254, 0.256, 0.258, 0.26, 0.262, 0.264, 0.266, 0.268, 0.27, 0.272, 0.274, 0.276, 0.278, 0.28, 0.282, 0.284, 0.286, 0.288, 0.29, 0.292, 0.294, 0.296, 0.298, 0.3, 0.302, 0.304, 0.306, 0.308, 0.31, 0.312, 0.314, 0.316, 0.318, 0.32, 0.322, 0.324, 0.326, 0.328, 0.33, 0.332, 0.334, 0.336, 0.338, 0.34, 0.342, 0.344, 0.346, 0.348, 0.35, 0.352, 0.354, 0.356, 0.358, 0.36, 0.362, 0.364, 0.366, 0.368, 0.37, 0.372, 0.374, 0.376, 0.378, 0.38, 0.382, 0.384, 0.386, 0.388, 0.39, 0.392, 0.394, 0.396, 0.398, 0.4, 0.402, 0.404, 0.406, 0.408, 0.41, 0.412, 0.414, 0.416, 0.418, 0.42, 0.422, 0.424, 0.426, 0.428, 0.43, 0.432, 0.434, 0.436, 0.438, 0.44, 0.442, 0.444, 0.446, 0.448, 0.45, 0.452, 0.454, 0.456, 0.458, 0.46, 0.462, 0.464, 0.466, 0.468, 0.47, 0.472, 0.474, 0.476, 0.478, 0.48, 0.482, 0.484, 0.486, 0.48, 0.49, 0.492, 0.494, 0.496, 0.498,0.5,0.505,0.51,0.515,0.52,0.525,0.53,0.535,0.54,0.545,0.55,0.56,0.565,0.57,0.575,0.58,0.585,0.59,0.595,0.6,0.605,0.61,0.615,0.62,0.625,0.63,0.635,0.64,0.645,0.65,0.655,0.66,0.665,0.67,0.675,0.68,0.685,0.69,0.695,0.7,0.705,0.71,0.715,0.72,0.725,0.73,0.735,0.74,0.745,0.75,0.755,0.76,0.765,0.77,0.775,0.78,0.785,0.79,0.795,0.8,0.805,0.81,0.815,0.82,0.825,0.83,0.835,0.84,0.845,0.85,0.855,0.86,0.865,0.87,0.875,0.88,0.885,0.89,0.895,0.9,0.905,0.91,0.915,0.92,0.925,0.93,0.935,0.94,0.945,0.95,0.955,0.96,0.965,0.97,0.975,0.98,0.985,0.99,0.995,1,1.01,1.02,1.03,1.04,1.05,1.06,1.07,1.08,1.09,1.1,1.11,1.12,1.13,1.14,1.15,1.16,1.17,1.18,1.19,1.2,1.21,1.22,1.23,1.24,1.25,1.26,1.27,1.28,1.29,1.3,1.31,1.32,1.33,1.34,1.35,1.36,1.37,1.38,1.39,1.4,1.41,1.42,1.43,1.44,1.45,1.46,1.47,1.48,1.49,1.5,1.51,1.52,1.53,1.54,1.55,1.56,1.57,1.58,1.59,1.6,1.61,1.62,1.63,1.64,1.65,1.66,1.67,1.68,1.69,1.7,1.71,1.72,1.73,1.74,1.75,1.76,1.77,1.78,1.79,1.8,1.81,1.82,1.83,1.84,1.85,1.86,1.87,1.88,1.89,1.9,1.91,1.92,1.93,1.94,1.95,1.96,1.97,1.98,1.99,2,2.02,2.04,2.06,2.08,2.1,2,12,2.14,2.16,2.18,2.20,2.22,2.24,2.26,2.28,2.3,2.32,2.34,2.36,2.38,2.40,2.42,2.44,2.46,2.48,2.5,2.52,2.54,2.56,2.58,2.6,2.62,2.64,2.66,2.68,2.70,2.72,2.74,2.76,2.78,2.8,2.82,2.84,2.86,2.88,2.9,2.92,2.94,2.96,2.98,3, 3.03, 3.06, 3.09, 3.12, 3.15, 3.18, 3.21, 3.24, 3.27, 3.3, 3.33, 3.36, 3.39, 3.42, 3.45, 3.48, 3.51, 3.54, 3.57, 3.6, 3.63, 3.66, 3.69, 3.71, 3.75, 3.78, 3.81, 3.84, 3.87, 3.9, 3.92, 3.96, 3.99, 4, 4.04, 4.08, 4.12, 4.16, 4.2, 4.24, 4.28, 4.32, 4.36, 4.4, 4.44, 4.48, 4.52, 4.56, 4.6, 4.64, 4.68, 4.72, 4.76, 4.8, 4.84, 4.88, 4.92, 4.96, 5, 5.05, 5.1, 5.15, 5.2, 5.25, 5.3, 5.35, 5.4, 5.45, 5.5, 5.55, 5.6, 5.65, 5.7, 5.75, 5.8, 5.85, 5.9, 5.95, 6, 6.06, 6.12, 6.18, 6.24, 6.3, 6.36, 6.42, 6.48, 6.54, 6.6, 6.66, 6.72, 6.78, 6.84, 6.9, 6.96, 7, 7.07, 7.14, 7.21, 7.28, 7.35, 7.42, 7.49, 7.56, 7.63, 7.7, 7.77, 7.84, 7.91, 7.98, 8, 8.08, 8.16, 8.24, 8.32, 8.4, 8.48, 8.56, 8.64, 8.72, 8.8, 8.88, 8.96, 9, 9.09, 9.18, 9.27, 9.36, 9.45, 9.54, 9.63, 9.72, 9.81, 9.9, 9.99, 10, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8, 12.9, 13, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8, 14.9, 15,  15.1, 15.2, 15.3, 15.4, 15.5, 15.6, 15.7, 15.8, 15.9, 16, 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, 16.7, 16.8, 16.9, 17, 17.1, 17.2, 17.3, 17.4, 17.5, 17.6, 17.7, 17.8, 17.9, 18, 18.1, 18.2, 18.3, 18.4, 18.5, 18.6, 18.7, 18.8, 18.9, 19, 19.1, 19.2, 19.3, 19.4, 19.5, 19.6, 19.7, 19.8, 19.9, 20, 20.2, 20.4, 20.6, 20.8, 21, 21.2, 21.4, 21.6, 21.8, 22, 22.2, 22.4, 22.6, 22.8, 23, 23.2, 23.4, 23.6, 23.8, 24, 24.2, 24.4, 24.6, 24.8, 25]
 
 # masseslist = [0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 
-# masseslist= [2]
+# masseslist = [2]
 
 print len(masseslist)
 
 masses1 = []
 for i in range(len(masseslist)):
-    if (masseslist[i] < 0.5) or (masseslist[i] > 0.41 and masseslist[i] < 0.515) or (masseslist[i] > 0.495 and masseslist[i] < 0.61) or (masseslist[i] > 0.695 and masseslist[i] < 0.88) or (masseslist[i] > 0.915 and masseslist[i] < 1.13) or (masseslist[i] > 2.81 and masseslist[i] < 4.09) or (masseslist[i] > 8.59 and masseslist[i] < 11.27) or (masseslist[i] >= 2.22  and masseslist[i] <= 4.52):
+    if (masseslist[i] < 0.5) or (masseslist[i] > 0.41 and masseslist[i] < 0.515) or (masseslist[i] > 0.495 and masseslist[i] < 0.61) or (masseslist[i] > 0.695 and masseslist[i] < 0.88) or (masseslist[i] > 0.915 and masseslist[i] < 1.13) or (masseslist[i] > 2.81 and masseslist[i] < 4.09) or (masseslist[i] > 8.59 and masseslist[i] < 11.27):
         continue
     masses1.append(masseslist[i])
 
@@ -56,9 +59,7 @@ print len(masses1)
 masses = [masses1[int(sys.argv[1])]]
 
 # ctaus = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1,2,3,4,5,6,7,8,9,10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-ctaus = [10]
-
-# ctaus = [1]
+ctaus = [1, 10, 50, 100]
 
 # card = "simple-shapes-TH1_mass2_Lxy1.0_2.4_pt0_25_1isomu_bernstein_order2.txt"
 
@@ -161,10 +162,16 @@ def seddatacard(inputcard = "card", mass = 2, ctau = 1, signalrate = 100,trigsf_
     os.system("sed -i 's/trigsf_unc\slnN\s1/trigsf_unc lnN {:.3f}/g' {}".format(1+trigsf_unc,outputcard))
     os.system("sed -i 's/oneminuseff\slnN\s1/oneminuseff lnN {:.3f}/g' {}".format(1+oneminuseff,outputcard))
     os.system("sed -i '/^mcstat_unc/ s/lnN\s1/lnN {:.3f}/g' {} ".format(1+mcstat_unc,outputcard))
+    # os.system("sed -i '/^pdf_index/d' {} ".format(outputcard))
+    os.system("sed -i 's/^mean .*$/mean param {} {}/' {} ".format(mass, mass*10*1.1*0.01*0.01*0.5, outputcard))
+    os.system("sed -i 's/^mean1 .*$/mean1 param {} {}/' {} ".format(mass, mass*10*1.1*0.01*0.01*0.5, outputcard))
+    os.system("sed -i '/^bgnorm /d' {} ".format(outputcard))
+    os.system("sed -i '/^signorm /d' {} ".format(outputcard))
 
 # seddatacard(inputcard = card, mass = 2, ctau = 1, signalrate = 0.5,trigsf_unc = float(trigsf_unc_val),oneminuseff = float(oneminuseff_val),mcstat_unc = float(mcstat_unc_val) )
 
 # exit()
+
 
 dct = {}
   
@@ -189,6 +196,7 @@ for j in range(len(masses)):
     dct['mass{}_brfracdowndown'.format(masses[j])] = []
     dct['mass{}_brfracobs'.format(masses[j])] = []
     dct['mass{}_significance'.format(masses[j])] = []
+    dct['mass{}_possignificance'.format(masses[j])] = []
 
     for k in range(len(ctaus)):
 
@@ -213,7 +221,7 @@ for j in range(len(masses)):
                     if  acc_val > 0.000000000001:
                         signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = acc_val
                     else:
-                        signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = 0.000001
+                        signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = 1e-8
 
                     # signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = acceptance(2,1,sample="hzd",whichbin="lxybin{}_ptbin{}_isobin{}".format(l+1,m+1,n+1)) 
                     
@@ -221,15 +229,19 @@ for j in range(len(masses)):
 
         if sum(signal_rates.values()) >= 0.01:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 10000.0
         elif sum(signal_rates.values()) < 0.01 and sum(signal_rates.values()) >= 0.001:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 100000.0
         elif sum(signal_rates.values()) < 0.001 and sum(signal_rates.values()) >= 0.0001:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 1000000.0
         elif sum(signal_rates.values()) < 0.0001:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 10000000.0
 
         # print "The scaled signal rates for lxy bins", signal_rates
@@ -238,7 +250,7 @@ for j in range(len(masses)):
 
         print "The sum of scaled signal rates", sum(signal_rates.values())
 
-        for file in glob.glob("simple*.txt"):
+        for file in glob.glob("simple*.txt".format(masses[j])):
             # print(file)
             bin_val = getbin(inputcard=file)
             signalrate_val = signal_rates[bin_val]
@@ -291,6 +303,18 @@ for j in range(len(masses)):
                 coms_exp = float(line[13:])   
 
 
+        os.system('combine -M Significance --rMin=0 datacard_mass{}_ctau{}_allbins.txt > com_2.out'.format(masses[j],ctaus[k]))
+        os.system('cat com_2.out')                                                                                            
+
+        com2_out = open('com_2.out','r') 
+
+        for line in com2_out:                                                                                                           
+
+            if line[:13] == 'Significance:':     
+                                                                                               
+                comspos_exp = float(line[13:])   
+
+
         exp_xsec = (coml_exp*totalsignalrate)/(101.3*2*acc_allbins)
         nevt = coml_exp*totalsignalrate
         nevtup = coml_1su*totalsignalrate
@@ -330,6 +354,7 @@ for j in range(len(masses)):
         dct['mass{}_brfracobs'.format(masses[j])].append(brfracobs)
 
         dct['mass{}_significance'.format(masses[j])].append(coms_exp)
+        dct['mass{}_possignificance'.format(masses[j])].append(comspos_exp)
 
     print "the expected 50% UL xsec for this mass for different ctaus is", dct['mass{}_exp50'.format(masses[j])]
     os.chdir("./..")
@@ -387,6 +412,9 @@ arr2obs.append(masses[0])
 arr3 = []
 arr3.append(masses[0])
 
+arr4 = []
+arr4.append(masses[0])
+
 for i in range(len(ctaus)):
     arr.append(dct['mass{}_exp50'.format(masses[0])][i])
     arr1.append(dct['mass{}_nevtexp50'.format(masses[0])][i])
@@ -404,54 +432,41 @@ for i in range(len(ctaus)):
     arr2obs.append(dct['mass{}_brfracobs'.format(masses[0])][i])
 
     arr3.append(dct['mass{}_significance'.format(masses[0])][i])
+    arr4.append(dct['mass{}_possignificance'.format(masses[0])][i])
 
 print arr
 
-# df = pd.DataFrame([arr],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+columns = ['mass'] + ['ctau = {}'.format(ctau) for ctau in ctaus]
 
-# df1 = pd.DataFrame([arr1],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df = pd.DataFrame([arr],columns=columns)
 
-# df1up = pd.DataFrame([arr1up],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1 = pd.DataFrame([arr1],columns=columns)
 
-# df1down = pd.DataFrame([arr1down],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1up = pd.DataFrame([arr1up],columns=columns)
 
-# df2 = pd.DataFrame([arr2],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1down = pd.DataFrame([arr1down],columns=columns)
 
-# df2up = pd.DataFrame([arr2up],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1upup = pd.DataFrame([arr1upup],columns=columns)
 
-# df2down = pd.DataFrame([arr2down],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1downdown = pd.DataFrame([arr1downdown],columns=columns)
 
-# df3 = pd.DataFrame([arr3],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1obs = pd.DataFrame([arr1obs],columns=columns)
 
+df2 = pd.DataFrame([arr2],columns=columns)
 
-df = pd.DataFrame([arr],columns=['mass', 'ctau = 10'])
+df2up = pd.DataFrame([arr2up],columns=columns)
 
-df1 = pd.DataFrame([arr1],columns=['mass', 'ctau = 10'])
+df2down = pd.DataFrame([arr2down],columns=columns)
 
-df1up = pd.DataFrame([arr1up],columns=['mass', 'ctau = 10'])
+df2upup = pd.DataFrame([arr2upup],columns=columns)
 
-df1down = pd.DataFrame([arr1down],columns=['mass', 'ctau = 10'])
+df2downdown = pd.DataFrame([arr2downdown],columns=columns)
 
-df1upup = pd.DataFrame([arr1upup],columns=['mass', 'ctau = 10'])
+df2obs = pd.DataFrame([arr2obs],columns=columns)
 
-df1downdown = pd.DataFrame([arr1downdown],columns=['mass', 'ctau = 10'])
+df3 = pd.DataFrame([arr3],columns=columns)
 
-df1obs = pd.DataFrame([arr1obs],columns=['mass', 'ctau = 10'])
-
-df2 = pd.DataFrame([arr2],columns=['mass', 'ctau = 10'])
-
-df2up = pd.DataFrame([arr2up],columns=['mass', 'ctau = 10'])
-
-df2down = pd.DataFrame([arr2down],columns=['mass', 'ctau = 10'])
-
-df2upup = pd.DataFrame([arr2upup],columns=['mass', 'ctau = 10'])
-
-df2downdown = pd.DataFrame([arr2downdown],columns=['mass', 'ctau = 10'])
-
-df2obs = pd.DataFrame([arr2obs],columns=['mass', 'ctau = 10'])
-
-df3 = pd.DataFrame([arr3],columns=['mass', 'ctau = 10'])
-
+df4 = pd.DataFrame([arr4],columns=columns)
 
 print df
 
@@ -476,3 +491,4 @@ df2downdown.to_csv('csvlimits1/BRbrULdowndown_mass{}_v0.csv'.format(masses[0]),i
 df2obs.to_csv('csvlimits1/BRbrULobs_mass{}_v0.csv'.format(masses[0]),index=False)
 
 df3.to_csv('csvlimits1/Significance_mass{}_v0.csv'.format(masses[0]),index=False)
+df4.to_csv('csvlimits1/posSignificance_mass{}_v0.csv'.format(masses[0]),index=False)
