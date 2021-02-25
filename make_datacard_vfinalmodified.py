@@ -1069,7 +1069,8 @@ def counting():
         
         datacard.write("------------------------------------\n")                                                                                                                    
         datacard.write("lumi lnN 1.025 1.0\n")                                                                                                                                      
-        datacard.write("bgnorm lnN - 1.5\n")                                                                                                                           
+        datacard.write("bgnorm_{}{}{} lnN - 1.5\n".format(j+1,j1+1,j2+1))
+                                                                       
         datacard.write("signorm lnN 1.05 -\n") 
 
         datacard.write("sb%i gmN %i - 0.67\n" %(j+1,numsideband))
@@ -1078,165 +1079,165 @@ def counting():
 
 
 
-        os.system('combine -M  AsymptoticLimits -m {} --rAbsAcc=0.0001 --rRelAcc=0.001 simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt > com.out'.format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order)) 
-	os.system('cat com.out')                                                                                                                                                                           
-        com_out = open('com.out','r')                                                                                                                                                                       
-        for line in com_out:                                                                                                                                                                                
-                if line[:15] == 'Observed Limit:':                                                                                                                                                         
-                        coml_obs = float(line[19:])                                                                                                                                                         
-                elif line[:15] == 'Expected  2.5%:':                                                                                                                                                       
-                        coml_2sd = float(line[19:])                                                                                                                                                        
+        # os.system('combine -M  AsymptoticLimits -m {} --rAbsAcc=0.0001 --rRelAcc=0.001 simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt > com.out'.format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order)) 
+	# os.system('cat com.out')                                                                                                                                                                           
+        # com_out = open('com.out','r')                                                                                                                                                                       
+        # for line in com_out:                                                                                                                                                                                
+        #         if line[:15] == 'Observed Limit:':                                                                                                                                                         
+        #                 coml_obs = float(line[19:])                                                                                                                                                         
+        #         elif line[:15] == 'Expected  2.5%:':                                                                                                                                                       
+        #                 coml_2sd = float(line[19:])                                                                                                                                                        
 			
-                elif line[:15] == 'Expected 16.0%:':                                                                                                                                                       
-                        coml_1sd = float(line[19:])                                                                                                                                                         
-                elif line[:15] == 'Expected 50.0%:':                                                                                                                                                       
-                        coml_exp = float(line[19:])                                                                                                                                                        
+        #         elif line[:15] == 'Expected 16.0%:':                                                                                                                                                       
+        #                 coml_1sd = float(line[19:])                                                                                                                                                         
+        #         elif line[:15] == 'Expected 50.0%:':                                                                                                                                                       
+        #                 coml_exp = float(line[19:])                                                                                                                                                        
 			
-                elif line[:15] == 'Expected 84.0%:':                                                                                                                                                       
-                        coml_1su = float(line[19:])                                                                                                                                                                                                                                                                                                                                                                   
-                elif line[:15] == 'Expected 97.5%:':                                                                                                                                                       
-                        coml_2su = float(line[19:])     
+        #         elif line[:15] == 'Expected 84.0%:':                                                                                                                                                       
+        #                 coml_1su = float(line[19:])                                                                                                                                                                                                                                                                                                                                                                   
+        #         elif line[:15] == 'Expected 97.5%:':                                                                                                                                                       
+        #                 coml_2su = float(line[19:])     
 
-	os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt".format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order))
-	KS_Fs = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".root")
-	KS_Ts = KS_Fs.Get("limit")
-	KS_Vs = []
+	# os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt".format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order))
+	# KS_Fs = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".root")
+	# KS_Ts = KS_Fs.Get("limit")
+	# KS_Vs = []
 
-	for i in range(0, KS_Ts.GetEntries()):
-		KS_Ts.GetEntry(i)
-		if (KS_Ts.limit < 10000):
-			KS_Vs.append(KS_Ts.limit)
+	# for i in range(0, KS_Ts.GetEntries()):
+	# 	KS_Ts.GetEntry(i)
+	# 	if (KS_Ts.limit < 10000):
+	# 		KS_Vs.append(KS_Ts.limit)
 
-        os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order,25))
-        KS_F = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".123456.root")
-        KS_T = KS_F.Get("limit")
-        KS_V = []
+        # os.system("combine -M GoodnessOfFit --algo=saturated -m {} simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt -t {}".format(mass, mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order,25))
+        # KS_F = ROOT.TFile("higgsCombineTest.GoodnessOfFit.mH" + str(mass) + ".123456.root")
+        # KS_T = KS_F.Get("limit")
+        # KS_V = []
 
-        for i in range(0, KS_T.GetEntries()):
-                KS_T.GetEntry(i)
-                if (KS_T.limit < 10000):
-                        KS_V.append(KS_T.limit)
+        # for i in range(0, KS_T.GetEntries()):
+        #         KS_T.GetEntry(i)
+        #         if (KS_T.limit < 10000):
+        #                 KS_V.append(KS_T.limit)
 
-        # Plot                                                                                                                                                                                               
-        minKS = min(min(KS_V), min(KS_Vs))
-        maxKS = max(max(KS_V), max(KS_Vs))
-        rangeKS = maxKS - minKS
-        KS_plot = ROOT.TH1F("KS_plot", "%s;Goodness Of Fit Statistic (Saturated);toys" % ("Goodness of Fit"),50, minKS-(rangeKS/10), maxKS+(rangeKS/10))
-        KS_plot.SetStats(0)
-        for i in KS_V:
-                KS_plot.Fill(i)
+        # # Plot                                                                                                                                                                                               
+        # minKS = min(min(KS_V), min(KS_Vs))
+        # maxKS = max(max(KS_V), max(KS_Vs))
+        # rangeKS = maxKS - minKS
+        # KS_plot = ROOT.TH1F("KS_plot", "%s;Goodness Of Fit Statistic (Saturated);toys" % ("Goodness of Fit"),50, minKS-(rangeKS/10), maxKS+(rangeKS/10))
+        # KS_plot.SetStats(0)
+        # for i in KS_V:
+        #         KS_plot.Fill(i)
+        # # GoodPlotFormat(KS_plot, "markers", ROOT.kBlack, 20)
+        # # KS_mk = ROOT.TLine(KS_Vs[0], 0., KS_Vs[0], KS_plot.GetMaximum())
+        # # KS_plot.Draw()
+
+        # integral = KS_plot.Integral(1, KS_plot.FindBin(KS_Vs[0]))
+
+        # # if saveplot:
         # GoodPlotFormat(KS_plot, "markers", ROOT.kBlack, 20)
         # KS_mk = ROOT.TLine(KS_Vs[0], 0., KS_Vs[0], KS_plot.GetMaximum())
-        # KS_plot.Draw()
-
-        integral = KS_plot.Integral(1, KS_plot.FindBin(KS_Vs[0]))
-
-        # if saveplot:
-        GoodPlotFormat(KS_plot, "markers", ROOT.kBlack, 20)
-        KS_mk = ROOT.TLine(KS_Vs[0], 0., KS_Vs[0], KS_plot.GetMaximum())
-        KS_mk.SetLineColor(ROOT.kRed)
-        KS_mk.SetLineWidth(3)
+        # KS_mk.SetLineColor(ROOT.kRed)
+        # KS_mk.SetLineWidth(3)
         
-        # Legend                                                                                                                                                                                                
-        legend = ROOT.TLegend(0.7, 0.7, 0.9, 0.9)
-        legend.SetBorderSize(0)
-        legend.SetFillColor(0)
-        legend.AddEntry(KS_plot, "Toy Models", "pe")
-        legend.AddEntry(KS_mk, "Bg, p = %.3f" % (integral / 25), "l")
+        # # Legend                                                                                                                                                                                                
+        # legend = ROOT.TLegend(0.7, 0.7, 0.9, 0.9)
+        # legend.SetBorderSize(0)
+        # legend.SetFillColor(0)
+        # legend.AddEntry(KS_plot, "Toy Models", "pe")
+        # legend.AddEntry(KS_mk, "Bg, p = %.3f" % (integral / 25), "l")
 
-        C_KS = ROOT.TCanvas()
-        C_KS.cd()
-        KS_plot.SetTitle("mass {}GeV, lxy {}cm - {}cm, pt{}-{}, {} {}_o({}) fit".format(mass,lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring1,poly,order))
-        KS_plot.Draw("e")
-        KS_mk.Draw("same")
-        legend.Draw()
-        ROOT.gPad.SetTicks(1, 1)
-        ROOT.gPad.RedrawAxis()
-        # AddCMSLumi(ROOT.gPad, plot_lumi, cmsextra)                                                                                                                        
+        # C_KS = ROOT.TCanvas()
+        # C_KS.cd()
+        # KS_plot.SetTitle("mass {}GeV, lxy {}cm - {}cm, pt{}-{}, {} {}_o({}) fit".format(mass,lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring1,poly,order))
+        # KS_plot.Draw("e")
+        # KS_mk.Draw("same")
+        # legend.Draw()
+        # ROOT.gPad.SetTicks(1, 1)
+        # ROOT.gPad.RedrawAxis()
+        # # AddCMSLumi(ROOT.gPad, plot_lumi, cmsextra)                                                                                                                        
                 
-        if not os.path.exists("bias_signalinjection_pvalue"):                                                                                                               
-                os.makedirs("bias_signalinjection_pvalue")  
-        C_KS.Print("bias_signalinjection_pvalue/goodnessoffit_mass{}_lxy{}_{}_pt{}_{}_{}_{}_order{}.png".format(mass, lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order))
+        # if not os.path.exists("bias_signalinjection_pvalue"):                                                                                                               
+        #         os.makedirs("bias_signalinjection_pvalue")  
+        # C_KS.Print("bias_signalinjection_pvalue/goodnessoffit_mass{}_lxy{}_{}_pt{}_{}_{}_{}_order{}.png".format(mass, lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order))
 
-        INJ = [2.]
-        ntoys = 500
-        cardname = "simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt".format(mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order)
-        name = "analysis"
+        # INJ = [2.]
+        # ntoys = 500
+        # cardname = "simple-shapes-TH1_mass{}_Lxy{}_{}_pt{}_{}_{}_{}_order{}.txt".format(mass, lxybins[j,0],lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order)
+        # name = "analysis"
 
-        for i in INJ:
-                os.system("combine %s -M GenerateOnly -t %d -m %f --saveToys --toysFrequentist --expectSignal %f -n %s%f --bypassFrequentistFit" %(cardname, ntoys, mass, i, name, i))
+        # for i in INJ:
+        #         os.system("combine %s -M GenerateOnly -t %d -m %f --saveToys --toysFrequentist --expectSignal %f -n %s%f --bypassFrequentistFit" %(cardname, ntoys, mass, i, name, i))
 
-                if num_after_point(mass) == 0:
+        #         if num_after_point(mass) == 0:
 
-                    os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%i.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
-
-
-                elif num_after_point(mass) == 1:
-
-                    os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%.1f.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
-
-                elif num_after_point(mass) == 2:
-
-                    os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%.2f.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
-
-                elif num_after_point(mass) == 3:
-
-                    os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%.3f.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
+        #             os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%i.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
 
 
-                F = ROOT.TFile("fitDiagnostics%s%f.root" % (name, i))
-                T = F.Get("tree_fit_sb")
+        #         elif num_after_point(mass) == 1:
+
+        #             os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%.1f.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
+
+        #         elif num_after_point(mass) == 2:
+
+        #             os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%.2f.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
+
+        #         elif num_after_point(mass) == 3:
+
+        #             os.system("combine -M FitDiagnostics -d %s -m %f --bypassFrequentistFit --skipBOnlyFit -t %d --toysFile higgsCombine%s%f.GenerateOnly.mH%.3f.123456.root --rMin -5 --rMax %f --saveWorkspace -n %s%f --forceRecreateNLL" %(cardname, mass, ntoys, name, i, mass, max(i*5, 5), name, i))
+
+
+        #         F = ROOT.TFile("fitDiagnostics%s%f.root" % (name, i))
+        #         T = F.Get("tree_fit_sb")
                 
-                H = ROOT.TH1F("Bias Test, injected r="+str(int(i)),
-                              "Bias Test;(r_{measured} - r_{injected})/#sigma_{r};toys", 48, -6., 6.)
-                T.Draw("(r-%f)/rErr>>Bias Test, injected r=%d" %(i, int(i)))
+        #         H = ROOT.TH1F("Bias Test, injected r="+str(int(i)),
+        #                       "Bias Test;(r_{measured} - r_{injected})/#sigma_{r};toys", 48, -6., 6.)
+        #         T.Draw("(r-%f)/rErr>>Bias Test, injected r=%d" %(i, int(i)))
 
-                # H = ROOT.TH1F("Bias Test, injected r="+str(int(i)),                                                                                                                    
-                #               "Signal Injection Test;r_{measured};toys", 100, -50., 50.)                                                                                               
-                # T.Draw("r>>Bias Test, injected r=%d" %(int(i)))                                                                                                                        
+        #         # H = ROOT.TH1F("Bias Test, injected r="+str(int(i)),                                                                                                                    
+        #         #               "Signal Injection Test;r_{measured};toys", 100, -50., 50.)                                                                                               
+        #         # T.Draw("r>>Bias Test, injected r=%d" %(int(i)))                                                                                                                        
                         
-                G = ROOT.TF1("f"+name+str(i), "gaus(0)", -5., 5.)
-                G.SetParLimits(0, 1, 2500)
-                G.SetParLimits(1, -5, 5)
-                # G.SetParLimits(1, -20, 20)                                                                                                                                             
-                H.Fit(G)
-                ROOT.gStyle.SetOptFit(1111)
+        #         G = ROOT.TF1("f"+name+str(i), "gaus(0)", -5., 5.)
+        #         G.SetParLimits(0, 1, 2500)
+        #         G.SetParLimits(1, -5, 5)
+        #         # G.SetParLimits(1, -20, 20)                                                                                                                                             
+        #         H.Fit(G)
+        #         ROOT.gStyle.SetOptFit(1111)
                 
-                bias = G.GetParameter(1)
-                biaserr = G.GetParError(1)
+        #         bias = G.GetParameter(1)
+        #         biaserr = G.GetParError(1)
 
-                C_B = ROOT.TCanvas()
-                C_B.cd()
-                H.SetTitle("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit".format(mass,lxybins[j,0], lxybins[j,1],poly,order))
+        #         C_B = ROOT.TCanvas()
+        #         C_B.cd()
+        #         H.SetTitle("mass {}GeV, lxy {}cm - {}cm, {}_o({}) fit".format(mass,lxybins[j,0], lxybins[j,1],poly,order))
                 
-                H.SetLineWidth(2)
-                H.Draw("e0")                
+        #         H.SetLineWidth(2)
+        #         H.Draw("e0")                
                 
-                C_B.SaveAs("bias_signalinjection_pvalue/biastest{}_mass{}_lxy{}_{}_pt{}_{}_{}_{}_order{}.png".format(i, mass, lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order))
+        #         C_B.SaveAs("bias_signalinjection_pvalue/biastest{}_mass{}_lxy{}_{}_pt{}_{}_{}_{}_order{}.png".format(i, mass, lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring,poly,order))
                 
 
-        ggphipoly = open("mass{}.csv".format(mass), "a")
-        ggphipoly.write(" mass\tlxy bin\tpt bin\tiso bin\tpoly order\tchi2\tndof\tpvalue\tbias\tbias_err\tExpected 2.5%: r < \tExpected 16.0%: r < \tExpected 50.0%: r < \tExpected 84.0%: r < \tExpected 97.5%: r < \tObserved Limit\n")
-        ggphipoly.write(" {}\t{} - {}\t{}-{}\t{}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring, poly, order, xssq, order , integral/25, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))  
+        # ggphipoly = open("mass{}.csv".format(mass), "a")
+        # ggphipoly.write(" mass\tlxy bin\tpt bin\tiso bin\tpoly order\tchi2\tndof\tpvalue\tbias\tbias_err\tExpected 2.5%: r < \tExpected 16.0%: r < \tExpected 50.0%: r < \tExpected 84.0%: r < \tExpected 97.5%: r < \tObserved Limit\n")
+        # ggphipoly.write(" {}\t{} - {}\t{}-{}\t{}\t{}{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(mass, lxybins[j,0], lxybins[j,1], ptbins[j1,0], ptstring, isostring, poly, order, xssq, order , integral/25, bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))  
             
         
-        # ggphipoly = open("mass{}_v0.csv".format(mass), "a")
-        # ggphipoly.write(" mass;lxy bin;poly order;chi2;ndof;pvalue;bias;bias_err;Expected 2.5%: r < ;Expected 16.0%: r < ;Expected 50.0%: r < ;Expected 84.0%: r < ;Expected 97.5%: r < ;Observed Limit\n")
-        # ggphipoly.write(" {};{} - {};{}{};{};{};{};{};{};{};{};{};{};{};{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, order , integral/25,bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
+        # # ggphipoly = open("mass{}_v0.csv".format(mass), "a")
+        # # ggphipoly.write(" mass;lxy bin;poly order;chi2;ndof;pvalue;bias;bias_err;Expected 2.5%: r < ;Expected 16.0%: r < ;Expected 50.0%: r < ;Expected 84.0%: r < ;Expected 97.5%: r < ;Observed Limit\n")
+        # # ggphipoly.write(" {};{} - {};{}{};{};{};{};{};{};{};{};{};{};{};{}\n".format(mass, lxybins[j,0], lxybins[j,1], poly, order, xssq, order , integral/25,bias, biaserr, coml_2sd, coml_1sd, coml_exp, coml_1su, coml_2su, coml_obs))
 
 
-        os.system('rm higgsCombineTest.AsymptoticLimits.mH{}.root'.format(mass))
-        os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.root'.format(mass))
-        os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.123456.root'.format(mass))
-        os.system('rm higgsCombineanalysis0.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
-        os.system('rm higgsCombineanalysis0.000000.GenerateOnly.mH{}.123456.root'.format(mass))
-        os.system('rm fitDiagnosticsanalysis0.000000.root')
-        os.system('rm higgsCombineanalysis2.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
-        os.system('rm higgsCombineanalysis2.000000.GenerateOnly.mH{}.123456.root'.format(mass))
-        os.system('rm fitDiagnosticsanalysis2.000000.root')
-        os.system('rm higgsCombineanalysis5.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
-        os.system('rm higgsCombineanalysis5.000000.GenerateOnly.mH{}.123456.root'.format(mass))
-        os.system('rm fitDiagnosticsanalysis5.000000.root')
+        # os.system('rm higgsCombineTest.AsymptoticLimits.mH{}.root'.format(mass))
+        # os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.root'.format(mass))
+        # os.system('rm higgsCombineTest.GoodnessOfFit.mH{}.123456.root'.format(mass))
+        # os.system('rm higgsCombineanalysis0.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
+        # os.system('rm higgsCombineanalysis0.000000.GenerateOnly.mH{}.123456.root'.format(mass))
+        # os.system('rm fitDiagnosticsanalysis0.000000.root')
+        # os.system('rm higgsCombineanalysis2.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
+        # os.system('rm higgsCombineanalysis2.000000.GenerateOnly.mH{}.123456.root'.format(mass))
+        # os.system('rm fitDiagnosticsanalysis2.000000.root')
+        # os.system('rm higgsCombineanalysis5.000000.FitDiagnostics.mH{}.123456.root'.format(mass))
+        # os.system('rm higgsCombineanalysis5.000000.GenerateOnly.mH{}.123456.root'.format(mass))
+        # os.system('rm fitDiagnosticsanalysis5.000000.root')
 
 def ftest(polytype="bernstein"):
     
