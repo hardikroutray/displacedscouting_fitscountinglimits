@@ -43,7 +43,7 @@ masseslist = [0.2, 0.202, 0.204, 0.206, 0.208, 0.21, 0.212, 0.214, 0.216, 0.218,
 
 # masseslist = [0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 
-# masseslist= [2]
+# masseslist= [5]
 
 print len(masseslist)
 
@@ -60,7 +60,7 @@ masses = [masses1[int(sys.argv[1])]]
 # ctaus = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1,2,3,4,5,6,7,8,9,10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
 ctaus = [1, 10, 100]
 
-# ctaus = [1]
+# ctaus = [0.1,0.2,0.5,0.8,1,2,5,8,10,20,50,80,100]
 
 # card = "simple-shapes-TH1_mass2_Lxy1.0_2.4_pt0_25_1isomu_bernstein_order2.txt"
 
@@ -163,8 +163,12 @@ def seddatacard(inputcard = "card", mass = 2, ctau = 1, signalrate = 100,trigsf_
     os.system("sed -i 's/trigsf_unc\slnN\s1/trigsf_unc lnN {:.3f}/g' {}".format(1+trigsf_unc,outputcard))
     os.system("sed -i 's/oneminuseff\slnN\s1/oneminuseff lnN {:.3f}/g' {}".format(1+oneminuseff,outputcard))
     os.system("sed -i '/^mcstat_unc/ s/lnN\s1/lnN {:.3f}/g' {} ".format(1+mcstat_unc,outputcard))
-    os.system("sed -i '/^pdf_index/d' {} ".format(outputcard))
-    # os.system("sed -i '/^pdf_index/ s/discrete/{}/g' {} ".format(1,outputcard))
+    # os.system("sed -i '/^pdf_index/d' {} ".format(outputcard))
+
+    os.system("sed -i '/^bgnorm/d' {} ".format(outputcard))
+    os.system("sed -i '/^signorm/d' {} ".format(outputcard))
+    os.system("sed -i 's/^mean .*$/mean param {} {}/' {} ".format(mass, mass*10*1.1*0.01*0.01*0.5, outputcard))
+    os.system("sed -i 's/^mean1 .*$/mean1 param {} {}/' {} ".format(mass, mass*10*1.1*0.01*0.01*0.5, outputcard))
 
 # seddatacard(inputcard = card, mass = 2, ctau = 1, signalrate = 0.5,trigsf_unc = float(trigsf_unc_val),oneminuseff = float(oneminuseff_val),mcstat_unc = float(mcstat_unc_val) )
 
@@ -193,6 +197,7 @@ for j in range(len(masses)):
     dct['mass{}_brfracdowndown'.format(masses[j])] = []
     dct['mass{}_brfracobs'.format(masses[j])] = []
     dct['mass{}_significance'.format(masses[j])] = []
+    dct['mass{}_possignificance'.format(masses[j])] = []
 
     for k in range(len(ctaus)):
 
@@ -217,22 +222,26 @@ for j in range(len(masses)):
                     if  acc_val > 0.000000000001:
                         signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = acc_val
                     else:
-                        signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = 0.000001
+                        signal_rates['lxybin{}_ptbin{}_isobin{}'.format(l+1,m+1,n+1)] = 1e-8
 
                     
         print "The sum of signal rates or total acceptance is", sum(signal_rates.values())
 
         if sum(signal_rates.values()) >= 0.01:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 10000.0
         elif sum(signal_rates.values()) < 0.01 and sum(signal_rates.values()) >= 0.001:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 100000.0
         elif sum(signal_rates.values()) < 0.001 and sum(signal_rates.values()) >= 0.0001:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 1000000.0
         elif sum(signal_rates.values()) < 0.0001:
             for sr in signal_rates.keys():
+                if signal_rates[sr] <= 1e-8: continue
                 signal_rates[sr] = signal_rates[sr] * 10000000.0
 
         # print "The scaled signal rates for lxy bins", signal_rates
@@ -294,6 +303,18 @@ for j in range(len(masses)):
                 coms_exp = float(line[13:])   
 
 
+        os.system('combine -M Significance --rMin=0 datacard_mass{}_ctau{}_allbins.txt > com_2.out'.format(masses[j],ctaus[k]))
+        os.system('cat com_2.out')                                                                                            
+
+        com2_out = open('com_2.out','r') 
+
+        for line in com2_out:                                                                                                           
+
+            if line[:13] == 'Significance:':     
+                                                                                               
+                comspos_exp = float(line[13:])   
+
+
         exp_xsec = (coml_exp*totalsignalrate)/(101.3*2*acc_allbins)
         nevt = coml_exp*totalsignalrate
         nevtup = coml_1su*totalsignalrate
@@ -333,6 +354,7 @@ for j in range(len(masses)):
         dct['mass{}_brfracobs'.format(masses[j])].append(brfracobs)
 
         dct['mass{}_significance'.format(masses[j])].append(coms_exp)
+        dct['mass{}_possignificance'.format(masses[j])].append(comspos_exp)
 
     print "the expected 50% UL xsec for this mass for different ctaus is", dct['mass{}_exp50'.format(masses[j])]
     os.chdir("./..")
@@ -390,6 +412,9 @@ arr2obs.append(masses[0])
 arr3 = []
 arr3.append(masses[0])
 
+arr4 = []
+arr4.append(masses[0])
+
 for i in range(len(ctaus)):
     arr.append(dct['mass{}_exp50'.format(masses[0])][i])
     arr1.append(dct['mass{}_nevtexp50'.format(masses[0])][i])
@@ -407,56 +432,45 @@ for i in range(len(ctaus)):
     arr2obs.append(dct['mass{}_brfracobs'.format(masses[0])][i])
 
     arr3.append(dct['mass{}_significance'.format(masses[0])][i])
+    arr4.append(dct['mass{}_possignificance'.format(masses[0])][i])
 
 print arr
 
-# df = pd.DataFrame([arr],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
 
-# df1 = pd.DataFrame([arr1],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+columns = ['mass'] + ['ctau = {}'.format(ctau) for ctau in ctaus]
 
-# df1up = pd.DataFrame([arr1up],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df = pd.DataFrame([arr],columns=columns)
 
-# df1down = pd.DataFrame([arr1down],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1 = pd.DataFrame([arr1],columns=columns)
 
-# df2 = pd.DataFrame([arr2],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1up = pd.DataFrame([arr1up],columns=columns)
 
-# df2up = pd.DataFrame([arr2up],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1down = pd.DataFrame([arr1down],columns=columns)
 
-# df2down = pd.DataFrame([arr2down],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1upup = pd.DataFrame([arr1upup],columns=columns)
 
-# df3 = pd.DataFrame([arr3],columns=['mass', 'ctau = 0.1', 'ctau = 0.2', 'ctau = 0.3', 'ctau = 0.4', 'ctau = 0.5', 'ctau = 0.6', 'ctau = 0.7', 'ctau = 0.8', 'ctau = 0.9', 'ctau = 1', 'ctau = 2',  'ctau = 3',  'ctau = 4', 'ctau = 5',  'ctau = 6', 'ctau = 7', 'ctau = 8', 'ctau = 9', 'ctau = 10', 'ctau = 15', 'ctau = 20', 'ctau = 25', 'ctau = 30', 'ctau = 35', 'ctau = 40', 'ctau = 45', 'ctau = 50', 'ctau = 55', 'ctau = 60', 'ctau = 65', 'ctau = 70', 'ctau = 75', 'ctau = 80', 'ctau = 85', 'ctau = 90', 'ctau = 95', 'ctau = 100'])
+df1downdown = pd.DataFrame([arr1downdown],columns=columns)
 
+df1obs = pd.DataFrame([arr1obs],columns=columns)
 
-df = pd.DataFrame([arr],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
+df2 = pd.DataFrame([arr2],columns=columns)
 
-df1 = pd.DataFrame([arr1],columns=['mass','ctau = 1', 'ctau = 10', 'ctau = 100'])
+df2up = pd.DataFrame([arr2up],columns=columns)
 
-df1up = pd.DataFrame([arr1up],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
+df2down = pd.DataFrame([arr2down],columns=columns)
 
-df1down = pd.DataFrame([arr1down],columns=['mass','ctau = 1', 'ctau = 10', 'ctau = 100'])
+df2upup = pd.DataFrame([arr2upup],columns=columns)
 
-df1upup = pd.DataFrame([arr1upup],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
+df2downdown = pd.DataFrame([arr2downdown],columns=columns)
 
-df1downdown = pd.DataFrame([arr1downdown],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
+df2obs = pd.DataFrame([arr2obs],columns=columns)
 
-df1obs = pd.DataFrame([arr1obs],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
+df3 = pd.DataFrame([arr3],columns=columns)
 
-df2 = pd.DataFrame([arr2],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
-df2up = pd.DataFrame([arr2up],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
-df2down = pd.DataFrame([arr2down],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
-df2upup = pd.DataFrame([arr2upup],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
-df2downdown = pd.DataFrame([arr2downdown],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
-df2obs = pd.DataFrame([arr2obs],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
-df3 = pd.DataFrame([arr3],columns=['mass', 'ctau = 1', 'ctau = 10', 'ctau = 100'])
-
+df4 = pd.DataFrame([arr4],columns=columns)
 
 print df
+
 
 if not os.path.exists("csvlimits1"):                                                           
                   
@@ -479,3 +493,4 @@ df2downdown.to_csv('csvlimits1/BRbrULdowndown_mass{}_v0.csv'.format(masses[0]),i
 df2obs.to_csv('csvlimits1/BRbrULobs_mass{}_v0.csv'.format(masses[0]),index=False)
 
 df3.to_csv('csvlimits1/Significance_mass{}_v0.csv'.format(masses[0]),index=False)
+df4.to_csv('csvlimits1/posSignificance_mass{}_v0.csv'.format(masses[0]),index=False)
