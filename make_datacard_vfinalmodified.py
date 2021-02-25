@@ -1388,7 +1388,7 @@ for j in range(len(lxybins)):
 
             bestbernorder = ftest(polytype="bernstein")
 
-            '''
+            # '''
  
             if bestbernorder != 0:
                 residualsberndown = get_chisq(poly="bernstein",order=bestbernorder-1,mask=False,saveplot=False,sigshape="dcbg")
@@ -1449,31 +1449,31 @@ for j in range(len(lxybins)):
             print "The fit status of best bern, berndown, bernup", fitstatusbern, fitstatusberndown, fitstatusbernup
             print "The fit status of expo", fitstatusexpo
 
-            '''
+            # '''
             # bestbernorder = 1
             # bestexpmulpolyorder = 1
             # bestexppowpolyorder = 1
 
-            pvalueberndown = 0.5
-            pvaluebern = 0.5
-            pvaluebernup = 0.5
-            pvalueexpo = 0.5
-            pvalueexpmulpoly = 0.5
-            pvalueexppowpoly = 0.5
+            # pvalueberndown = 0.5
+            # pvaluebern = 0.5
+            # pvaluebernup = 0.5
+            # pvalueexpo = 0.5
+            # pvalueexpmulpoly = 0.5
+            # pvalueexppowpoly = 0.5
 
-            pvalueberndown_new = 0.5
-            pvaluebern_new = 0.5
-            pvaluebernup_new = 0.5
-            pvalueexpo_new = 0.5
-            pvalueexpmulpoly_new = 0.5
-            pvalueexppowpoly_new = 0.5
+            # pvalueberndown_new = 0.5
+            # pvaluebern_new = 0.5
+            # pvaluebernup_new = 0.5
+            # pvalueexpo_new = 0.5
+            # pvalueexpmulpoly_new = 0.5
+            # pvalueexppowpoly_new = 0.5
 
-            fitstatusberndown = 0
-            fitstatusbern = 0
-            fitstatusbernup = 0
-            fitstatusexpo = 0
-            fitstatusexpmulpoly = 0
-            fitstatusexppowpoly = 0
+            # fitstatusberndown = 0
+            # fitstatusbern = 0
+            # fitstatusbernup = 0
+            # fitstatusexpo = 0
+            # fitstatusexpmulpoly = 0
+            # fitstatusexppowpoly = 0
             
 
 
