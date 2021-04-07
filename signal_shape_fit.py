@@ -31,20 +31,20 @@ ROOT.FWLiteEnabler.enable()
 # load FWlite python libraries                                                                                                                                                       
 from DataFormats.FWLite import Handle, Events
 
-# masses = [0.5, 0.6, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 18, 21, 25]
-masses = [3, 4, 5, 6, 8, 10, 12, 15, 18, 21, 25]
+masses = [0.5, 0.6, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 18, 21, 25, 35, 50]
+# masses = [3, 4, 5, 6, 8, 10, 12, 15, 18, 21, 25, 35, 50]
 # masses = [0.5, 0.6, 0.75, 1, 1.25, 1.5, 2]
+# masses = [35, 50]
 
 # ctaus = [1,10,100]
-ctaus = [10]
+ctaus = [1000]
 
 # mass = masses[int(sys.argv[1])]
 
 tree_muMC = ROOT.TChain('t')
-tree_muMC.Add("/cms/routray/hzd_mass_ctau_scan.root")
+tree_muMC.Add("/cms/routray/acceptancecsv/hzd_mass_ctau_scan.root")
 
 lxybins = np.array([[0.0,0.2], [0.2,1.0], [1.0,2.4], [2.4,3.1], [3.1,7.0], [7.0,11.0]])                             
-
 
 def massfit(mass = 2,ctau = 1):
 
@@ -67,7 +67,14 @@ def massfit(mass = 2,ctau = 1):
     mc_frac = ROOT.RooRealVar('mc_frac', 'mc_frac', 0.45)
 
     mean1 = ROOT.RooRealVar("mean1","Mean of Gaussian",float(mass- (25*binwidth)),float(mass + (25*binwidth)))                
-    sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.35) #change this to 0.05 for mass < 2 GeV                                       
+
+    if mass < 2:
+        sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.05)
+    elif mass <= 25 and mass >= 2:
+        sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.35)
+    elif mass > 30:
+        sigma1 = ROOT.RooRealVar("sigma1","Width of Gaussian",0.55)
+
     gaus = ROOT.RooGaussian("gaus","gaus",x,mean1,sigma1)  
     mc_frac1 = ROOT.RooRealVar('mc_frac1', 'mc_frac1', 0.5)
 
@@ -107,7 +114,7 @@ def massfit(mass = 2,ctau = 1):
     xframe1.GetXaxis().SetTitle("Dimuon Mass [GeV]")
     xframe1.Draw()
     c1.Draw()
-    c1.SaveAs("dCBsignalshape_hzd_vf/signal_shape_mass{}_ctau{}.png".format(mass,ctau))
+    c1.SaveAs("dCBsignalshape_hzd_vff/signal_shape_mass{}_ctau{}.png".format(mass,ctau))
 
 
     return (mean.getVal(), mean.getError(), mean1.getVal(), mean1.getError(), sigma.getVal(), sigma.getError(), mc_frac.getVal(), mc_frac.getError(), mc_frac1.getVal(), mc_frac1.getError())
@@ -122,13 +129,19 @@ for m in range(len(masses)):
 
         print "running on mass", masses[m], "and ctau", ctaus[c]
 
-        h = ROOT.TH1F("h","h", int(round(50/binwidth)), 0, 50)
+        # h = ROOT.TH1F("h","h", int(round(50/binwidth)), 0, 50)
+
+        if masses[m] == 50:
+            h = ROOT.TH1F("h","h", int(round(100/binwidth)), 0, 100)
+        else:
+            h = ROOT.TH1F("h","h", int(round(50/binwidth)), 0, 50)
+
         tree_muMC.Draw('mass>>h','sample_mass == {} && sample_ctau == {}'.format(masses[m],ctaus[c]),'')
         fit = massfit(mass = masses[m], ctau = ctaus[c])
 
         arr = []
         arr = [masses[m], fit[0], fit[1], fit[2], fit[3], fit[4], fit[5], fit[6], fit[7], fit[8], fit[9]]
         df = pd.DataFrame([arr],columns=['mass','meandCB','meandCBerr','meanGaus','meanGauserr','sigma','sigmaerr','mc_fracdCB','mc_fracdCBerr','mcfracGaus','mcfracGauserr'])
-        df.to_csv('dCBsignalshape_hzd_vf/dCBfithzd_mass{}_ctau{}_lxyall_vf.csv'.format(masses[m],ctaus[c]),index=False)
+        df.to_csv('dCBsignalshape_hzd_vff/dCBfithzd_mass{}_ctau{}_lxyall_vf.csv'.format(masses[m],ctaus[c]),index=False)
 
 
