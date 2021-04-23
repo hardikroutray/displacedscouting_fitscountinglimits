@@ -17,6 +17,7 @@ from matplotlib import cm # to colormap 3D surfaces from blue to red
 
 import matplotlib.pyplot as plt
 from scipy.interpolate import Rbf
+from scipy.interpolate import interp2d
 
 import ROOT
 
@@ -61,9 +62,8 @@ print(masses1)
 masses = [masses1[int(sys.argv[1])]]
 
 # ctaus = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1,2,3,4,5,6,7,8,9,10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-ctaus = [1,10,100,1000]
-# ctaus = [0.1,0.2,0.5,0.8,1,2,5,8,10,20,50,80,100]
-# ctaus = [0.1]
+# ctaus = [1,10,100,1000]
+ctaus = [0.1,0.2,0.5,0.8,1,2,5,8,10,20,50,80,100,200,500,800,1000]
 
 # card = "simple-shapes-TH1_mass2_Lxy1.0_2.4_pt0_25_1isomu_bernstein_order2.txt"
 
@@ -76,7 +76,6 @@ def get_brzdtosm(mass):
     return row["br_zdtosm"]
 
 def acceptance_and_staterr_4mu(mass=2, ctau=1):
-    from scipy.interpolate import interp2d
 
     df = hzdallcsv4mu.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=["acc"])
     masses = df.index
@@ -116,69 +115,83 @@ def acceptance(mass = 2, ctau = 1, sample="hzd",whichbin="lxybin1_ptbin1_isobin1
 
     if sample == "hzd":
         if whichbin != "allbins":
-            x_data = hzdbincsv['mass'].tolist()
-            y_data = hzdbincsv['ctau'].tolist()
-            z_data = hzdbincsv['acc_'+whichbin].tolist()
+
+            df = hzdbincsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['acc_'+whichbin])
+            x_data = df.index
+            y_data = df.columns.levels[1]
+            z_data = df.values.T
+
         elif whichbin == "allbins":
-            x_data = hzdallcsv['mass'].tolist()
-            y_data = hzdallcsv['ctau'].tolist()
-            z_data = hzdallcsv['acc_'+whichbin].tolist()
+
+            df = hzdallcsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['acc_'+whichbin])
+            x_data = df.index
+            y_data = df.columns.levels[1]
+            z_data = df.values.T
 
     if sample == "bphi":
         if whichbin != "allbins":
-            x_data = bphibincsv['mass'].tolist()
-            y_data = bphibincsv['ctau'].tolist()
-            z_data = bphibincsv['acc_'+whichbin].tolist()
+
+            df = bphibincsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['acc_'+whichbin])
+            x_data = df.index
+            y_data = df.columns.levels[1]
+            z_data = df.values.T
+
         elif whichbin == "allbins":
-            x_data = bphiallcsv['mass'].tolist()
-            y_data = bphiallcsv['ctau'].tolist()
-            z_data = bphiallcsv['acc_'+whichbin].tolist()
 
-    acc = Rbf(x_data, y_data, z_data, epsilon=0.03)
+            df = bphiallcsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['acc_'+whichbin])
+            x_data = df.index
+            y_data = df.columns.levels[1]
+            z_data = df.values.T
 
-    return acc(mass,ctau)
+    acc = interp2d(x_data, y_data, z_data, bounds_error=True)
+
+    return acc(mass,ctau)[0]
 
 # print "the total acceptance", float(acceptance(2,1,sample="hzd",whichbin="allbins"))
 # print "the bin acceptance", float(acceptance(2,1,sample="hzd",whichbin=getbin(inputcard=card)))
 
-def get_systematics(mass = 2, ctau = 1, sample="hzd"):
+def get_oneminuseff(mass = 2, ctau = 1, sample="hzd"):
 
     if sample == "hzd":
-        x_data = hzdallcsv['mass'].tolist()
-        y_data = hzdallcsv['ctau'].tolist()
-        z_data_trigsfunc = hzdallcsv['trigsf_unc'].tolist()
-        z_data_oneminuseff = hzdallcsv['oneminuseff'].tolist()
-        # trigsf_err = hzdbincsv.loc[(tree_mucsv['mass'] == masses[j]) & (tree_mucsv['ctau'] == 1) & (tree_mucsv['lxybin'],'neventsmc'].iloc[0]
+
+        df = hzdallcsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['oneminuseff'])
+        x_data = df.index
+        y_data = df.columns.levels[1]
+        z_data = df.values.T
+
     if sample == "bphi":
-        x_data = bphiallcsv['mass'].tolist()
-        y_data = bphiallcsv['ctau'].tolist()
-        z_data_trigsfunc = bphiallcsv['trigsf_unc'].tolist()
-        z_data_oneminuseff = bphiallcsv['oneminuseff'].tolist()
+        
+        df = bphiallcsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['oneminuseff'])
+        x_data = df.index
+        y_data = df.columns.levels[1]
+        z_data = df.values.T
 
-    sys_trigsfunc = Rbf(x_data, y_data, z_data_trigsfunc, epsilon=0.03)
-    sys_oneminuseff = Rbf(x_data, y_data, z_data_oneminuseff, epsilon=0.03)
+    sys_oneminuseff = interp2d(x_data, y_data, z_data, bounds_error=True)
 
-    # return sys_trigsfunc(mass,ctau), sys_oneminuseff(mass,ctau)
-    return sys_oneminuseff(mass,ctau)
+    return sys_oneminuseff(mass,ctau)[0]
 
-# trigsf_unc_val, oneminuseff_val = get_systematics(mass = 2, ctau = 1, sample="hzd")   
-# print "trigsfunc", float(trigsf_unc_val), "oneminuseff", float(oneminuseff_val) 
+# oneminuseff_val = get_systematics(mass = 2, ctau = 1, sample="hzd")   
+# print "oneminuseff", float(oneminuseff_val) 
 
 def get_mcstatunc(mass = 2, ctau = 1, sample="hzd", whichbin="lxybin1_ptbin1_isobin1"):
     
     if sample == "hzd":
-        x_data = hzdbincsv['mass'].tolist()
-        y_data = hzdbincsv['ctau'].tolist()
-        z_data = hzdbincsv['nevt_'+whichbin].tolist()
+        
+        df = hzdbincsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['nevt_'+whichbin])
+        x_data = df.index
+        y_data = df.columns.levels[1]
+        z_data = df.values.T
 
     if sample == "bphi":
-        x_data = bphibincsv['mass'].tolist()
-        y_data = bphibincsv['ctau'].tolist()
-        z_data = bphibincsv['nevt_'+whichbin].tolist()
+        
+        df = bphibincsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['nevt_'+whichbin])
+        x_data = df.index
+        y_data = df.columns.levels[1]
+        z_data = df.values.T
 
-    sys_mcstatunc = Rbf(x_data, y_data, z_data, epsilon=0.03)
+    sys_mcstatunc = interp2d(x_data, y_data, z_data, bounds_error=True)
 
-    return 1/np.sqrt(np.clip(sys_mcstatunc(mass,ctau),1,None))
+    return 1/np.sqrt(np.clip((sys_mcstatunc(mass,ctau)[0]),1,None))
 
 # mcstat_unc_val = get_mcstatunc(mass = 2, ctau = 1, sample="hzd", whichbin=getbin(inputcard=card))
 # print "mcstatunc", float(mcstat_unc_val)
@@ -186,18 +199,22 @@ def get_mcstatunc(mass = 2, ctau = 1, sample="hzd", whichbin="lxybin1_ptbin1_iso
 def get_trigsfunc(mass = 2, ctau = 1, sample="hzd", whichbin="lxybin1_ptbin1_isobin1"):
 
     if sample == "hzd":
-        x_data = hzdbincsv['mass'].tolist()
-        y_data = hzdbincsv['ctau'].tolist()
-        z_data = hzdbincsv['trigsf_unc_'+whichbin].tolist()
+        
+        df = hzdbincsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['trigsf_unc_'+whichbin])
+        x_data = df.index
+        y_data = df.columns.levels[1]
+        z_data = df.values.T
 
     if sample == "bphi":
-        x_data = bphibincsv['mass'].tolist()
-        y_data = bphibincsv['ctau'].tolist()
-        z_data = bphibincsv['trigsf_unc_'+whichbin].tolist()
+        
+        df = bphibincsv.sort_values(["mass","ctau"]).pivot(index="mass", columns="ctau", values=['trigsf_unc_'+whichbin])
+        x_data = df.index
+        y_data = df.columns.levels[1]
+        z_data = df.values.T
 
-    sys_trigsfunc = Rbf(x_data, y_data, z_data, epsilon=0.03)
+    sys_trigsfunc = interp2d(x_data, y_data, z_data, bounds_error=True)
 
-    return sys_trigsfunc(mass,ctau)
+    return sys_trigsfunc(mass,ctau)[0]
 
 def seddatacard(inputcard = "card", mass = 2, ctau = 1, signalrate = 100,trigsf_unc = 0,oneminuseff = 0,mcstat_unc = 0 ):
 
@@ -353,7 +370,7 @@ fourmubg gmN 0  -       1
             # print(file)
             bin_val = getbin(inputcard=file)
             signalrate_val = signal_rates[bin_val]
-            oneminuseff_val = get_systematics(mass = masses[j], ctau = ctaus[k], sample="hzd")
+            oneminuseff_val = get_oneminuseff(mass = masses[j], ctau = ctaus[k], sample="hzd")
             mcstat_unc_val = get_mcstatunc(mass = masses[j], ctau = ctaus[k], sample="hzd", whichbin=bin_val)
             trigsf_unc_val = get_trigsfunc(mass = masses[j], ctau = ctaus[k], sample="hzd", whichbin=bin_val)            
             seddatacard(inputcard = file, mass = masses[j], ctau = ctaus[k], signalrate = signalrate_val,trigsf_unc = trigsf_unc_val,oneminuseff = oneminuseff_val,mcstat_unc = mcstat_unc_val )
